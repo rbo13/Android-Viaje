@@ -5,6 +5,12 @@
 
     <string name="password_hint">Password</string>
     <string name="email_hint">Email</string>
+    <string name="username_hint">Username</string>
+    <string name="family_name_hint">Family Name</string>
+    <string name="given_name_hint">Given Name</string>
+    <string name="contact_number_hint">Contact Number</string>
+    <string name="address_hint">Address</string>
+    <string name="license_number_hint">License Number</string>
     <string name="sign_up_button_label">Sign Up</string>
     <string name="signup_error_message">Please make sure you enter an email address and password!</string>
     <string name="signup_error_title">Error!</string>
@@ -16,5 +22,6 @@
     <string name="title_activity_login">Sign in</string>
     <string name="add_item">Add New Item</string>
     <string name="action_logout">Logout</string>
+    <string name="signup_title_header">Personal Information:</string>
 
 </resources>

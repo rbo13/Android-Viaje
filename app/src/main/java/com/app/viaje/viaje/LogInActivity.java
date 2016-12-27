@@ -16,11 +16,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
+import models.Motorist;
 
 public class LogInActivity extends AppCompatActivity {
 
@@ -29,6 +31,7 @@ public class LogInActivity extends AppCompatActivity {
     protected Button loginButton;
     protected EditText emailField;
     protected EditText passwordField;
+
 
 //    @BindView(R.id.signUpText) TextView signup;
 //    @BindView(R.id.emailField) EditText emailField;
@@ -67,6 +70,8 @@ public class LogInActivity extends AppCompatActivity {
 
                     String email = emailField.getText().toString().trim();
                     String password = passwordField.getText().toString().trim();
+
+
 
                     if(email.isEmpty() || password.isEmpty()) {
 
