@@ -33,8 +33,9 @@ dependencies {
     compile 'com.google.firebase:firebase-auth:9.4.0'
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'org.nd4j:jackson:0.7.1'
-//    apt 'com.jakewharton:butterknife-compiler:8.2.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile 'de.hdodenhof:circleimageview:2.1.0'
+    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+//    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     testCompile 'junit:junit:4.12'
     apply plugin: 'com.google.gms.google-services'
 }

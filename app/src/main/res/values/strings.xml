@@ -24,7 +24,10 @@
     <string name="sign_up_text">Sign Up!</string>
     <string name="title_activity_login">Sign in</string>
     <string name="add_item">Add New Item</string>
-    <string name="action_logout">Logout</string>
+    <string name="action_logout">Log out</string>
     <string name="signup_title_header">Personal Information:</string>
+    <string name="go_to_your_profile_hint">Go to your profile</string>
+    <string name="see_map_hint">See Map</string>
+    <string name="assistance_hint">Ask for assistance</string>
 
 </resources>
