@@ -9,16 +9,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
+    private DatabaseReference dbRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        dbRef = FirebaseDatabase.getInstance().getReference();
 
         if(mFirebaseUser == null){
             //Not logged-in.
@@ -65,5 +71,22 @@ public class MainActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+    }
+
+    @OnClick(R.id.logout_button)
+    void onLogout(){
+        mFirebaseAuth.signOut();
+        loadLoginView();
+    }
+
+    @OnClick(R.id.emergency_button_id)
+    void onEmergencyClick(){
+        Toast.makeText(getApplicationContext(), "Click", Toast.LENGTH_LONG).show();
+
+        /**
+         * TODO:: Create new emergency request
+         * to firebase.
+         */
+
     }
 }

@@ -21,6 +21,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import models.Motorist;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -56,8 +58,8 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+
+        ButterKnife.bind(this);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
 
@@ -75,58 +77,55 @@ public class SignUpActivity extends AppCompatActivity {
         plate_number = (EditText) findViewById(R.id.plateNoField);
         vehicle_type = (EditText) findViewById(R.id.vehicleTypeField);
 
+    }
 
-        signUpButton = (Button) findViewById(R.id.signupButton);
+    @OnClick(R.id.signupButton)
+    void onSignup(){
 
-        signUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = emailEditText.getText().toString().trim();
-                String password = passwordEditText.getText().toString().trim();
+        String email = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
 
-                if(email.isEmpty() || password.isEmpty()){
-                    AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
-                    builder.setMessage(R.string.signup_error_message)
-                            .setTitle(R.string.signup_error_title)
-                            .setPositiveButton(android.R.string.ok, null);
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }else{
-                    mFirebaseAuth.createUserWithEmailAndPassword(email, password)
-                            .addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
+        if(email.isEmpty() || password.isEmpty()){
 
-                                    if (task.isSuccessful()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
+            builder.setMessage(R.string.signup_error_message)
+                    .setTitle(R.string.signup_error_title)
+                    .setPositiveButton(android.R.string.ok, null);
+            AlertDialog dialog = builder.create();
+            dialog.show();
 
-                                        saveUserInfo();
+        }else{
 
-                                        Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        startActivity(intent);
-                                    } else {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
-                                        builder.setMessage(task.getException().getMessage())
-                                                .setTitle(R.string.login_error_title)
-                                                .setPositiveButton(android.R.string.ok, null);
-                                        AlertDialog dialog = builder.create();
-                                        dialog.show();
-                                    }
+            mFirebaseAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
 
-                                }
-                            });
-                }
-            }
-        });
+                            if (task.isSuccessful()) {
 
+                                saveUserInfo();
 
+                                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                            } else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
+                                builder.setMessage(task.getException().getMessage())
+                                        .setTitle(R.string.login_error_title)
+                                        .setPositiveButton(android.R.string.ok, null);
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
+
+                        }
+                    });
+
+        }
 
     }
 
     private void saveUserInfo(){
-
-        Toast.makeText(getApplicationContext(), "Add New User", Toast.LENGTH_LONG).show();
 
         String user_name = username.getText().toString().trim();
         String email = emailEditText.getText().toString().trim();

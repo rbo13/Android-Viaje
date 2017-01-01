@@ -29,5 +29,6 @@
     <string name="go_to_your_profile_hint">Go to your profile</string>
     <string name="see_map_hint">See Map</string>
     <string name="assistance_hint">Ask for assistance</string>
+    <string name="emergency_hint">Emergency</string>
 
 </resources>
