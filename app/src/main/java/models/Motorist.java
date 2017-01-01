@@ -1,5 +1,7 @@
 package models;
 
+import org.nd4j.shade.jackson.annotation.JsonIgnore;
+
 /**
  * Created by papua on 27/12/2016.
  */
@@ -13,7 +15,13 @@ public class Motorist {
     private String contact_number;
     private String address;
     private String license_number;
+    private String vehicle_information_model_year;
+    private String vehicle_information_plate_number;
+    private String vehicle_information_vehicle_type;
     private String type;
+
+    @JsonIgnore
+    private String key;
 
     public Motorist() {  }
 
@@ -89,5 +97,37 @@ public class Motorist {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getVehicle_information_model_year() {
+        return vehicle_information_model_year;
+    }
+
+    public void setVehicle_information_model_year(String vehicle_information_model_year) {
+        this.vehicle_information_model_year = vehicle_information_model_year;
+    }
+
+    public String getVehicle_information_plate_number() {
+        return vehicle_information_plate_number;
+    }
+
+    public void setVehicle_information_plate_number(String vehicle_information_plate_number) {
+        this.vehicle_information_plate_number = vehicle_information_plate_number;
+    }
+
+    public String getVehicle_information_vehicle_type() {
+        return vehicle_information_vehicle_type;
+    }
+
+    public void setVehicle_information_vehicle_type(String vehicle_information_vehicle_type) {
+        this.vehicle_information_vehicle_type = vehicle_information_vehicle_type;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

@@ -11,6 +11,9 @@
     <string name="contact_number_hint">Contact Number</string>
     <string name="address_hint">Address</string>
     <string name="license_number_hint">License Number</string>
+    <string name="model_year_hint">Vehicle Model Year</string>
+    <string name="plate_number_hint">Plate Number</string>
+    <string name="vehicle_type_hint">Vehicle Type</string>
     <string name="sign_up_button_label">Sign Up</string>
     <string name="signup_error_message">Please make sure you enter an email address and password!</string>
     <string name="signup_error_title">Error!</string>

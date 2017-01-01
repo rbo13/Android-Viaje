@@ -33,6 +33,9 @@ public class SignUpActivity extends AppCompatActivity {
     protected EditText contact_number;
     protected EditText address;
     protected EditText license_number;
+    protected EditText model_year;
+    protected EditText plate_number;
+    protected EditText vehicle_type;
 
     //Butterknife
     /**
@@ -68,6 +71,9 @@ public class SignUpActivity extends AppCompatActivity {
         contact_number = (EditText) findViewById(R.id.contactNoField);
         address = (EditText) findViewById(R.id.addressField);
         license_number = (EditText) findViewById(R.id.licenseNoField);
+        model_year = (EditText) findViewById(R.id.modelYearField);
+        plate_number = (EditText) findViewById(R.id.plateNoField);
+        vehicle_type = (EditText) findViewById(R.id.vehicleTypeField);
 
 
         signUpButton = (Button) findViewById(R.id.signupButton);
@@ -123,22 +129,32 @@ public class SignUpActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "Add New User", Toast.LENGTH_LONG).show();
 
         String user_name = username.getText().toString().trim();
+        String email = emailEditText.getText().toString().trim();
         String familyName = family_name.getText().toString().trim();
         String givenName = given_name.getText().toString().trim();
         String contactNumber = contact_number.getText().toString().trim();
         String user_address = address.getText().toString().trim();
         String licenseNumber = license_number.getText().toString().trim();
+        String plateNumber = plate_number.getText().toString().trim();
+        String modelYear = model_year.getText().toString().trim();
+        String vehicleType = vehicle_type.getText().toString().trim();
 
         Motorist motorist = new Motorist();
 
         motorist.setUsername(user_name);
         motorist.setFamily_name(familyName);
+        motorist.setEmail_address(email);
         motorist.setGiven_name(givenName);
         motorist.setContact_number(contactNumber);
         motorist.setAddress(user_address);
         motorist.setLicense_number(licenseNumber);
+        motorist.setVehicle_information_plate_number(plateNumber);
+        motorist.setVehicle_information_model_year(modelYear);
+        motorist.setVehicle_information_vehicle_type(vehicleType);
 
-        dbRef.child("users").setValue(motorist);
+        motorist.setType("motorist");
+
+        dbRef.child("users").push().setValue(motorist);
 
         Toast.makeText(this, "Information Saved...", Toast.LENGTH_LONG).show();
     }
