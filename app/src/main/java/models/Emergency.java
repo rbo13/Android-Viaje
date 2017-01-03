@@ -8,14 +8,14 @@ public class Emergency {
 
     private String email;
     private String status;
-    private String latitude;
-    private String longitude;
+    private double latitude;
+    private double longitude;
     private String description;
 
 
     public Emergency() {  }
 
-    public Emergency(String email, String status, String latitude, String longitude, String description) {
+    public Emergency(String email, String status, double latitude, double longitude, String description) {
         this.email = email;
         this.status = status;
         this.latitude = latitude;
@@ -39,19 +39,19 @@ public class Emergency {
         this.status = status;
     }
 
-    public String getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(String latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public String getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(String longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
