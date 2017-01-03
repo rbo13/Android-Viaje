@@ -24,6 +24,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import models.Motorist;
+import helpers.ViajeConstants;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -153,7 +154,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         motorist.setType("motorist");
 
-        dbRef.child("users").push().setValue(motorist);
+        dbRef.child(ViajeConstants.USERS_KEY).push().setValue(motorist);
 
         Toast.makeText(this, "Information Saved...", Toast.LENGTH_LONG).show();
     }

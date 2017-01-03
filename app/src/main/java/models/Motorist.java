@@ -8,6 +8,7 @@ import org.nd4j.shade.jackson.annotation.JsonIgnore;
 
 public class Motorist {
 
+    private String motorist_id;
     private String username;
     private String email_address;
     private String family_name;
@@ -25,7 +26,8 @@ public class Motorist {
 
     public Motorist() {  }
 
-    public Motorist(String username, String email_address, String family_name, String given_name, String contact_number, String address, String license_number) {
+    public Motorist(String motorist_id, String username, String email_address, String family_name, String given_name, String contact_number, String address, String license_number, String vehicle_information_model_year, String vehicle_information_plate_number, String vehicle_information_vehicle_type, String type, String key) {
+        this.motorist_id = motorist_id;
         this.username = username;
         this.email_address = email_address;
         this.family_name = family_name;
@@ -33,6 +35,19 @@ public class Motorist {
         this.contact_number = contact_number;
         this.address = address;
         this.license_number = license_number;
+        this.vehicle_information_model_year = vehicle_information_model_year;
+        this.vehicle_information_plate_number = vehicle_information_plate_number;
+        this.vehicle_information_vehicle_type = vehicle_information_vehicle_type;
+        this.type = type;
+        this.key = key;
+    }
+
+    public String getMotorist_id() {
+        return motorist_id;
+    }
+
+    public void setMotorist_id(String motorist_id) {
+        this.motorist_id = motorist_id;
     }
 
     public String getUsername() {
