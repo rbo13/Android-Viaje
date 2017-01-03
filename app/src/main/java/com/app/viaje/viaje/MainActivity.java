@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
             emergency.setEmail(email);
             emergency.setDescription("50/50");
-            emergency.setStatus("Kamatyunon");
+            emergency.setStatus("pending");
             emergency.setLatitude(latitude);
             emergency.setLongitude(longitude);
 
