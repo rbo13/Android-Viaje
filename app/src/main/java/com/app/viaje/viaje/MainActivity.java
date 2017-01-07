@@ -51,6 +51,12 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private LocationListener locationListener;
 
+    /**
+     * Set this variable to true
+     * after going to Settings.
+     */
+    //boolean firstTime = true;
+
     //GPSTracker Service
     GPSTracker gps;
 
@@ -71,6 +77,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        Log.i("onRESUME HERE: ", "onResume");
+//
+//        if(firstTime){
+//            Log.i("FOR FIRST TIME: ", "FIRST TIME HERE");
+//            firstTime = false;
+//        }else{
+//            Log.i("NOT FIRST", "ITS NOT FIRST");
+//        }
+//
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
