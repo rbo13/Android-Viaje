@@ -21,23 +21,12 @@
         android:layout_height="@dimen/activity_vertical_margin_xlg"
         app:civ_border_width="2dp"
         app:civ_border_color="#FF000000"
-        android:layout_marginTop="@dimen/activity_vertical_margin_md"
+        android:layout_marginTop="@dimen/activity_vertical_margin_s"
         android:src="@drawable/profile"
         android:layout_below="@+id/logout_button"
         android:layout_alignLeft="@+id/to_profile_button_id"
         android:layout_alignStart="@+id/to_profile_button_id" />
 
-
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/to_profile_button_id"
-        android:layout_width="128dp"
-        android:layout_height="wrap_content"
-        android:hint="@string/go_to_your_profile_hint"
-        android:textColorHint="#ffffff"
-        android:background="@drawable/rounded_button"
-        android:layout_below="@+id/profilePic"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/activity_horizontal_margin"/>
 
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/to_map_button_id"
@@ -72,13 +61,24 @@
         android:text="@string/emergency_hint"/>
 
     <android.support.v7.widget.AppCompatButton
+        android:id="@+id/to_profile_button_id"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/go_to_your_profile_hint"
+        android:textColorHint="#ffffff"
+        android:background="@drawable/rounded_button"
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/to_map_button_id"
+        android:layout_alignStart="@+id/to_map_button_id" />
+
+    <android.support.v7.widget.AppCompatButton
         android:id="@+id/logout_button"
         android:layout_width="128dp"
         android:layout_height="wrap_content"
         android:hint="@string/action_logout"
         android:textColorHint="#ffffff"
         android:background="@drawable/rounded_button"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />

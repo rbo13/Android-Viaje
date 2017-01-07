@@ -146,10 +146,27 @@ public class MainActivity extends AppCompatActivity {
     void onEmergencyClick(){
         Toast.makeText(getApplicationContext(), "Send Emergency Help", Toast.LENGTH_LONG).show();
 
-        /**
-         * TODO:: Create new emergency request
-         * to firebase.
-         */
         sendEmergencyHelp();
+    }
+
+    @OnClick(R.id.to_map_button_id)
+    void toMapActivity(){
+
+        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.to_profile_button_id)
+    void toProfileActivity(){
+
+        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.to_assistance_button_id)
+    void toAssistanceActivity(){
+
+        Intent intent = new Intent(getApplicationContext(), AssistanceActivity.class);
+        startActivity(intent);
     }
 }
