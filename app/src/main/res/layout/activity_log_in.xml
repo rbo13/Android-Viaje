@@ -8,12 +8,23 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="#f0f0f0"
     tools:context=".LogInActivity">
+
+    <TextView
+        android:id="@+id/appId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textSize="@dimen/font_size_default_xl"
+        android:layout_centerHorizontal="true"
+        android:padding="@dimen/activity_horizontal_margin"/>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/emailFieldTextLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/appId">
 
         <EditText
             android:id="@+id/emailField"
@@ -49,18 +60,19 @@
             android:inputType="textPassword"/>
 
     </android.support.design.widget.TextInputLayout>
-    
+
 
 
     <Button
         android:id="@+id/loginButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/passwordFieldTextLayout"
         android:layout_below="@+id/passwordFieldTextLayout"
-        android:text="@string/login_button_label" />
+        android:text="@string/login_button_label"
+        android:clickable="true"
+        android:background="@drawable/ripple_effect"/>
 
-    
+
     <TextView
         android:id="@+id/signUpText"
         android:layout_width="wrap_content"
