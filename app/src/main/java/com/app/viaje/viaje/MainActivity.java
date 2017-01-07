@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Toast.makeText(MainActivity.this, "Send Help!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Dont send help!", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
             builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Toast.makeText(MainActivity.this, "Dont send help!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Send Help!", Toast.LENGTH_SHORT).show();
                 }
             });
 
