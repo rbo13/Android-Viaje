@@ -1,25 +1,16 @@
 package com.app.viaje.viaje;
 
-import android.*;
-import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -27,21 +18,22 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
-import butterknife.BindView;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import helpers.ViajeConstants;
 import models.Emergency;
 
 public class MainActivity extends AppCompatActivity {
+
+    //Checks user in-activity.
+    private Timer timer;
+
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -77,19 +69,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        Log.i("onRESUME HERE: ", "onResume");
-//
-//        if(firstTime){
-//            Log.i("FOR FIRST TIME: ", "FIRST TIME HERE");
-//            firstTime = false;
-//        }else{
-//            Log.i("NOT FIRST", "ITS NOT FIRST");
-//        }
-//
-//    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        timer = new Timer();
+
+        Log.i("Main", "Invoking logout timer");
+        LogOutTimerTask logoutTimerTask = new LogOutTimerTask();
+
+        timer.schedule(logoutTimerTask, 60000);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (timer != null) {
+            timer.cancel();
+            Log.i("Main", "cancel timer");
+            timer = null;
+        }
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -188,4 +191,67 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), AssistanceActivity.class);
         startActivity(intent);
     }
+
+    /**
+     * In-line class for logout timer
+     */
+
+    private class LogOutTimerTask extends TimerTask{
+
+        @Override
+        public void run() {
+
+//            Intent i = new Intent(MainActivity.this, MainActivity.class);
+//            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivity(i);
+
+            MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    if(!(MainActivity.this).isFinishing())
+                    {
+                        /**
+                         * Create an alert dialog
+                         */
+                        showHelpDialog();
+                    }
+                }
+            });
+
+//            finish();
+
+        }
+
+        private void showHelpDialog() {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+            builder.setTitle(getString(R.string.dialog_title));
+            builder.setMessage(getString(R.string.dialog_message));
+
+            String positiveText = getString(R.string.dialog_positive_text);
+
+            builder.setPositiveButton(positiveText, new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(MainActivity.this, "Send Help!", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            String negativeText = getString(R.string.dialog_negative_text);
+            builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(MainActivity.this, "Dont send help!", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+
+            dialog.show();
+        }
+    }
+
 }

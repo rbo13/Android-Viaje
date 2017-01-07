@@ -21,7 +21,7 @@
     <string name="login_error_message">Please make sure you enter an email address and password!</string>
     <string name="login_error_title">Error!</string>
     <string name="login_button_label">Login</string>
-    <string name="sign_up_text">Sign Up!</string>
+    <string name="sign_up_text">Not a member yet? \n \t Register here</string>
     <string name="title_activity_login">Sign in</string>
     <string name="add_item">Add New Item</string>
     <string name="action_logout">Log out</string>
@@ -31,5 +31,10 @@
     <string name="assistance_hint">Ask for assistance</string>
     <string name="emergency_hint">Emergency</string>
     <string name="title_activity_maps">Map</string>
+    <string name="dialog_title">Are you okay?</string>
+    <string name="dialog_message">You have been idle for five(5) minutes. We would like to check if you are okay?</string>
+    <string name="dialog_negative_text">Need Help!</string>
+    <string name="dialog_positive_text">I am totally fine.</string>
+
 
 </resources>
