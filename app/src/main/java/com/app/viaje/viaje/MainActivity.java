@@ -201,10 +201,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
 
-//            Intent i = new Intent(MainActivity.this, MainActivity.class);
-//            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            startActivity(i);
-
             MainActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -212,14 +208,12 @@ public class MainActivity extends AppCompatActivity {
                     if(!(MainActivity.this).isFinishing())
                     {
                         /**
-                         * Create an alert dialog
+                         * Show Help Dialog
                          */
                         showHelpDialog();
                     }
                 }
             });
-
-//            finish();
 
         }
 
