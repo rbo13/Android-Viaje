@@ -1,6 +1,5 @@
 package models;
 
-import org.nd4j.shade.jackson.annotation.JsonIgnore;
 
 /**
  * Created by papua on 27/12/2016.
@@ -21,8 +20,7 @@ public class Motorist {
     private String vehicle_information_vehicle_type;
     private String type;
 
-    @JsonIgnore
-    private String key;
+
 
     public Motorist() {  }
 
@@ -39,7 +37,6 @@ public class Motorist {
         this.vehicle_information_plate_number = vehicle_information_plate_number;
         this.vehicle_information_vehicle_type = vehicle_information_vehicle_type;
         this.type = type;
-        this.key = key;
     }
 
     public String getMotorist_id() {
@@ -136,13 +133,5 @@ public class Motorist {
 
     public void setVehicle_information_vehicle_type(String vehicle_information_vehicle_type) {
         this.vehicle_information_vehicle_type = vehicle_information_vehicle_type;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 }

@@ -34,6 +34,7 @@ import butterknife.OnClick;
 import butterknife.OnLongClick;
 import helpers.ViajeConstants;
 import models.Motorist;
+import models.OnlineUser;
 
 public class LogInActivity extends AppCompatActivity {
 
@@ -45,6 +46,8 @@ public class LogInActivity extends AppCompatActivity {
     protected EditText emailField;
     protected EditText passwordField;
 
+
+    GPSTracker gps;
 
 //    @BindView(R.id.signUpText) TextView signup;
 //    @BindView(R.id.emailField) EditText emailField;
@@ -66,6 +69,13 @@ public class LogInActivity extends AppCompatActivity {
         passwordField = (EditText) findViewById(R.id.passwordField);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
 
     }
 
@@ -112,16 +122,63 @@ public class LogInActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * Get data from SharedPreferences
-     */
-//    private void getMotoristDataFromSharedPreference() {
-//
-//        SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", 0);
-//
-//        String email = sharedPreferences.getString("email", "");
-//        String password = sharedPreferences.getString("password", "");
-//    }
+    private void saveOnlineUserToFirebase(final double latitude, final double longitude) {
+
+        String string_latitude = Double.toString(latitude);
+        String string_longitude = Double.toString(longitude);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("userCoordinates", Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("latitude", string_latitude);
+        editor.putString("longitude", string_longitude);
+        editor.apply();
+
+        //Get timestamp
+        Long timestamp_long = System.currentTimeMillis() / 1000;
+        final String timestamp = timestamp_long.toString();
+
+        //Get the login user from firebase.
+        String email_address = emailField.getText().toString().trim();
+
+        Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
+                .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
+                .equalTo(email_address);
+
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot motoristSnapshot : dataSnapshot.getChildren()){
+
+                    //Get single motorist and pass it to online user.
+                    Motorist motorist = motoristSnapshot.getValue(Motorist.class);
+
+                    /**
+                     * Create onlineUser instance
+                     * to save to "onlineusers".
+                     */
+                    OnlineUser onlineUser = new OnlineUser();
+
+                    onlineUser.setLatitude(latitude);
+                    onlineUser.setLongitude(longitude);
+                    onlineUser.setTimestamp(timestamp);
+                    onlineUser.setMotorist(motorist);
+
+                    dbRef.child(ViajeConstants.USERS_ONLINE_KEY).push().setValue(onlineUser);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                Log.w("ERROR: ", "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+
+    }
+
 
     /**
      * Butterknife components
@@ -134,6 +191,8 @@ public class LogInActivity extends AppCompatActivity {
 
     @OnClick(R.id.loginButton)
     void onLogin(){
+
+        gps = new GPSTracker(LogInActivity.this);
 
         Toast.makeText(LogInActivity.this, "Login Button Clicked", Toast.LENGTH_SHORT).show();
 
@@ -164,10 +223,30 @@ public class LogInActivity extends AppCompatActivity {
                                  */
                                 saveMotoristInfo();
 
-                                Intent intent = new Intent(LogInActivity.this, MainActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
+                                /**
+                                 * Check if the user enabled
+                                 * the location setting. If enabled,
+                                 * save the location to SharedPref
+                                 * and send request to firebase and add it
+                                 * to "onlineusers" collection,
+                                 * otherwise open Settings Activity.
+                                 */
+                                if(gps.canGetLocation()){
+
+                                    Toast.makeText(LogInActivity.this, "Latitude: "+ gps.getLatitude() + " ; " + "Longitude: " + gps.getLongitude(), Toast.LENGTH_LONG).show();
+
+                                    saveOnlineUserToFirebase(gps.getLatitude(), gps.getLongitude());
+
+                                    Intent intent = new Intent(LogInActivity.this, MainActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+
+                                }else{
+                                    gps.showSettingsAlert();
+                                }
+
+
                             }else{
                                 AlertDialog.Builder builder = new AlertDialog.Builder(LogInActivity.this);
                                 builder.setMessage(task.getException().getMessage())
