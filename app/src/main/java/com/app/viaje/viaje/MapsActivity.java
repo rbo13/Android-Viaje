@@ -1,7 +1,10 @@
 package com.app.viaje.viaje;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -49,11 +52,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          */
         if(gps.canGetLocation()){
 
-            double latitude = gps.getLatitude();
-            double longitude = gps.getLongitude();
+            SharedPreferences sharedPreferences = getSharedPreferences("userCoordinates", Context.MODE_PRIVATE);
 
+            double latitude = Double.parseDouble(sharedPreferences.getString("latitude", ""));
+            double longitude = Double.parseDouble(sharedPreferences.getString("longitude", ""));
 
-            //LatLng location = new LatLng(10.3157, 123.8854); // Cebu LatLng
+            Toast.makeText(MapsActivity.this, "Latitude: "+ latitude + " : " + "Longitude: " +longitude, Toast.LENGTH_LONG).show();
 
             LatLng location = new LatLng(latitude, longitude); // User Current Location
             mMap.addMarker(new MarkerOptions().position(location).title("Current Location"));
