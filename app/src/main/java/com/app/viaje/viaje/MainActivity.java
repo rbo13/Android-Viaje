@@ -262,9 +262,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         String email_address = sharedPreferences.getString("email", "");
 
         dbRef = FirebaseDatabase.getInstance().getReference()
-                .child("online_users");
+                .child(ViajeConstants.ONLINE_USERS_KEY);
 
-        dbRef.orderByChild("motorist/email_address")
+        dbRef.orderByChild(ViajeConstants.MOTORIST_EMAIL_ADDRESS_KEY)
                 .equalTo(email_address)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
