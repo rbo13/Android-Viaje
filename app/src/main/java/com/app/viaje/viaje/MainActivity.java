@@ -25,9 +25,14 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -35,13 +40,13 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import helpers.ViajeConstants;
 import models.Emergency;
+import models.OnlineUser;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
             GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener{
 
     //Checks user in-activity.
     private Timer timer;
-
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -240,6 +245,45 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         editor.putString("latitude", lat);
         editor.putString("longitude", lon);
         editor.apply();
+
+        /**
+         * Update the single login user
+         * at firebase "online_users" record.
+         */
+        updateUserLocationOnLocationChanged(lat, lon);
+    }
+
+    private void updateUserLocationOnLocationChanged(final String string_latitude, final String string_longitude) {
+
+        final double latitude = Double.parseDouble(string_latitude);
+        final double longitude = Double.parseDouble(string_longitude);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
+        String email_address = sharedPreferences.getString("email", "");
+
+        dbRef = FirebaseDatabase.getInstance().getReference()
+                .child(ViajeConstants.ONLINE_USERS_KEY);
+
+        dbRef.orderByChild(ViajeConstants.MOTORIST_EMAIL_ADDRESS_KEY)
+                .equalTo(email_address)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        DataSnapshot nodeDataSnapshot = dataSnapshot.getChildren().iterator().next();
+                        String key = nodeDataSnapshot.getKey();
+
+                        HashMap<String, Object> updated_online_user = new HashMap<>();
+                        updated_online_user.put("latitude", latitude);
+                        updated_online_user.put("longitude", longitude);
+
+                        dbRef.child(key).updateChildren(updated_online_user);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     /**

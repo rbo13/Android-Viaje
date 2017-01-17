@@ -184,7 +184,7 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
                     onlineUser.setTimestamp(timestamp);
                     onlineUser.setMotorist(motorist);
 
-                    dbRef.child(ViajeConstants.USERS_ONLINE_KEY).push().setValue(onlineUser);
+                    dbRef.child(ViajeConstants.ONLINE_USERS_KEY).push().setValue(onlineUser);
                 }
 
             }
