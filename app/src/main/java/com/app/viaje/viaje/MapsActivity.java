@@ -1,13 +1,18 @@
 package com.app.viaje.viaje;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -26,6 +31,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        initMap();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        Toast.makeText(MapsActivity.this, "MapsActivity onStop", Toast.LENGTH_SHORT).show();
+        clearPin();
+    }
 
     /**
      * Manipulates the map once available.
@@ -47,23 +66,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          * base on GPS Location and apply it
          * to the map.
          */
+//        setUpMapPin(googleMap);
+    }
+
+    private void setUpMapPin(GoogleMap googleMap){
+
+        mMap = googleMap;
+
+        SharedPreferences sharedPreferences = getSharedPreferences("userCoordinates", Context.MODE_PRIVATE);
+
+        double latitude = Double.parseDouble(sharedPreferences.getString("latitude", ""));
+        double longitude = Double.parseDouble(sharedPreferences.getString("longitude", ""));
+
+        Toast.makeText(MapsActivity.this, "Latitude: "+ latitude + " : " + "Longitude: " +longitude, Toast.LENGTH_LONG).show();
+
+        LatLng location = new LatLng(latitude, longitude); // User Current Location
+        mMap.addMarker(new MarkerOptions().position(location).title("Current Location"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16));
+    }
+
+    private void initMap(){
+
+        gps = new GPSTracker(MapsActivity.this);
+
+
         if(gps.canGetLocation()){
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
 
-            double latitude = gps.getLatitude();
-            double longitude = gps.getLongitude();
-
-
-            //LatLng location = new LatLng(10.3157, 123.8854); // Cebu LatLng
-
-            LatLng location = new LatLng(latitude, longitude); // User Current Location
-            mMap.addMarker(new MarkerOptions().position(location).title("Current Location"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16));
-
+            mapFragment.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    setUpMapPin(googleMap);
+                }
+            });
         }else{
             gps.showSettingsAlert();
         }
 
 
+    }
+
+    private void clearPin(){
+
+        mMap.clear();
     }
 }

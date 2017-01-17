@@ -5,9 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,11 +19,20 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,12 +40,13 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import helpers.ViajeConstants;
 import models.Emergency;
+import models.OnlineUser;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+            GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener{
 
     //Checks user in-activity.
     private Timer timer;
-
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -42,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
 
     private LocationManager locationManager;
     private LocationListener locationListener;
+
+    Location mLastLocation;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    String lat, lon;
 
     /**
      * Set this variable to true
@@ -57,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        buildGoogleApiClient();
+
         ButterKnife.bind(this);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -67,6 +87,20 @@ public class MainActivity extends AppCompatActivity {
             // Not logged-in.
             loadLoginView();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mGoogleApiClient.disconnect();
     }
 
     @Override
@@ -154,42 +188,102 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
 
-    /**
-     * Butterknife components.
-     */
-    @OnClick(R.id.logout_button)
-    void onLogout(){
-        mFirebaseAuth.signOut();
-        loadLoginView();
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(100); // Update location every second
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            lat = String.valueOf(mLastLocation.getLatitude());
+            lon = String.valueOf(mLastLocation.getLongitude());
+
+            SharedPreferences sharedPreferences = getSharedPreferences("userCoordinates", Context.MODE_PRIVATE);
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("latitude", lat);
+            editor.putString("longitude", lon);
+            editor.apply();
+        }
+
     }
 
-    @OnClick(R.id.emergency_button_id)
-    void onEmergencyClick(){
-        Toast.makeText(getApplicationContext(), "Send Emergency Help", Toast.LENGTH_LONG).show();
+    @Override
+    public void onConnectionSuspended(int i) {
 
-        sendEmergencyHelp();
     }
 
-    @OnClick(R.id.to_map_button_id)
-    void toMapActivity(){
-
-        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-        startActivity(intent);
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        buildGoogleApiClient();
     }
 
-    @OnClick(R.id.to_profile_button_id)
-    void toProfileActivity(){
+    synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
 
-        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-        startActivity(intent);
     }
 
-    @OnClick(R.id.to_assistance_button_id)
-    void toAssistanceActivity(){
+    @Override
+    public void onLocationChanged(Location location) {
 
-        Intent intent = new Intent(getApplicationContext(), AssistanceActivity.class);
-        startActivity(intent);
+        lat = String.valueOf(location.getLatitude());
+        lon = String.valueOf(location.getLongitude());
+
+        SharedPreferences sharedPreferences = getSharedPreferences("userCoordinates", Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("latitude", lat);
+        editor.putString("longitude", lon);
+        editor.apply();
+
+        /**
+         * Update the single login user
+         * at firebase "online_users" record.
+         */
+        updateUserLocationOnLocationChanged(lat, lon);
+    }
+
+    private void updateUserLocationOnLocationChanged(final String string_latitude, final String string_longitude) {
+
+        final double latitude = Double.parseDouble(string_latitude);
+        final double longitude = Double.parseDouble(string_longitude);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
+        String email_address = sharedPreferences.getString("email", "");
+
+        dbRef = FirebaseDatabase.getInstance().getReference()
+                .child(ViajeConstants.ONLINE_USERS_KEY);
+
+        dbRef.orderByChild(ViajeConstants.MOTORIST_EMAIL_ADDRESS_KEY)
+                .equalTo(email_address)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        DataSnapshot nodeDataSnapshot = dataSnapshot.getChildren().iterator().next();
+                        String key = nodeDataSnapshot.getKey();
+
+                        HashMap<String, Object> updated_online_user = new HashMap<>();
+                        updated_online_user.put("latitude", latitude);
+                        updated_online_user.put("longitude", longitude);
+
+                        dbRef.child(key).updateChildren(updated_online_user);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     /**
@@ -246,6 +340,43 @@ public class MainActivity extends AppCompatActivity {
 
             dialog.show();
         }
+    }
+
+    /**
+     * Butterknife components.
+     */
+    @OnClick(R.id.logout_button)
+    void onLogout(){
+        mFirebaseAuth.signOut();
+        loadLoginView();
+    }
+
+    @OnClick(R.id.emergency_button_id)
+    void onEmergencyClick(){
+        Toast.makeText(getApplicationContext(), "Send Emergency Help", Toast.LENGTH_LONG).show();
+
+        sendEmergencyHelp();
+    }
+
+    @OnClick(R.id.to_map_button_id)
+    void toMapActivity(){
+
+        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.to_profile_button_id)
+    void toProfileActivity(){
+
+        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.to_assistance_button_id)
+    void toAssistanceActivity(){
+
+        Intent intent = new Intent(getApplicationContext(), AssistanceActivity.class);
+        startActivity(intent);
     }
 
 }
