@@ -91,7 +91,6 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     @Override
