@@ -52,8 +52,6 @@ import models.OnlineUser;
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
             GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener{
 
-    Handler handler;
-
     //Checks user in-activity.
     private Timer timer;
 
