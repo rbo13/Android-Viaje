@@ -35,6 +35,15 @@
     <string name="dialog_message">You have been idle for five(5) minutes. We would like to check if you are okay?</string>
     <string name="dialog_negative_text">Need Help!</string>
     <string name="dialog_positive_text">I am totally fine.</string>
+    <string name="choose_action">Choose Action</string>
+
+    <string name="service_type_tire_service">Tire Service</string>
+    <string name="service_type_towing">Towing</string>
+    <string name="service_type_fuel_delivery">Fuel Delivery Service</string>
+    <string name="service_type_battery_boost">Battery Boost</string>
+
+    <string name="back_to_main_menu">Back to Main Menu</string>
+
 
 
 </resources>
