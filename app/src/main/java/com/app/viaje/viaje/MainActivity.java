@@ -393,6 +393,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     Toast.makeText(MainActivity.this, "Send Help!", Toast.LENGTH_SHORT).show();
+                    sendEmergencyHelp();
                 }
             });
 
