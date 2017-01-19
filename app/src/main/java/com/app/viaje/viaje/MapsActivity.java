@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -13,6 +14,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -72,6 +74,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Toast.makeText(MapsActivity.this, "Map Ready!", Toast.LENGTH_SHORT).show();
         getSafezones(googleMap);
+        currentUserLocation(googleMap);
 
         /**
          * @description :: Get user location
@@ -96,6 +99,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .title("Current Location")
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.motorist)));
 
+        mMap.addCircle(drawCircle(location));
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14));
     }
@@ -111,6 +116,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
+
                     currentUserLocation(googleMap);
                     getSafezones(googleMap);
                 }
@@ -197,4 +203,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
     }
+
+    private CircleOptions drawCircle(LatLng location){
+
+        CircleOptions options = new CircleOptions();
+
+        options.center(location);
+        options.radius(1500);
+        options.fillColor(ContextCompat.getColor(getApplicationContext(), R.color.app_color));
+        options.strokeColor(ContextCompat.getColor(getApplicationContext(), R.color.stroke_color));
+        options.strokeWidth(10);
+
+        return options;
+    }
+
 }
