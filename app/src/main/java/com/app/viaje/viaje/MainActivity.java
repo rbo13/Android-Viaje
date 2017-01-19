@@ -71,12 +71,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private LocationRequest mLocationRequest;
     String lat, lon;
 
-    /**
-     * Set this variable to true
-     * after going to Settings.
-     */
-    //boolean firstTime = true;
-
     //GPSTracker Service
     GPSTracker gps;
 
@@ -138,7 +132,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -314,10 +307,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                             Log.e("ERROR:", "onCancelled", databaseError.toException());
                         }
                     });
-
         }
-
-
     }
 
     private void deleteUserRecordOnFirebase() {

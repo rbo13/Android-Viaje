@@ -2,6 +2,7 @@ package com.app.viaje.viaje;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -72,37 +73,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         gps = new GPSTracker(MapsActivity.this);
 
-        Toast.makeText(MapsActivity.this, "Map Ready!", Toast.LENGTH_SHORT).show();
         getSafezones(googleMap);
         currentUserLocation(googleMap);
-
-        /**
-         * @description :: Get user location
-         * base on GPS Location and apply it
-         * to the map.
-         */
-//        setUpMapPin(googleMap);
-    }
-
-    private void currentUserLocation(GoogleMap googleMap){
-
-        mMap = googleMap;
-
-        SharedPreferences sharedPreferences = getSharedPreferences("userCoordinates", Context.MODE_PRIVATE);
-
-        double latitude = Double.parseDouble(sharedPreferences.getString("latitude", ""));
-        double longitude = Double.parseDouble(sharedPreferences.getString("longitude", ""));
-
-        LatLng location = new LatLng(latitude, longitude); // User Current Location
-
-        mMap.addMarker(new MarkerOptions().position(location)
-                .title("Current Location")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.motorist)));
-
-        mMap.addCircle(drawCircle(location));
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14));
     }
 
     private void initMap(){
@@ -131,6 +103,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void clearPin(){
 
         mMap.clear();
+    }
+
+    private void currentUserLocation(GoogleMap googleMap){
+
+        mMap = googleMap;
+
+        SharedPreferences sharedPreferences = getSharedPreferences("userCoordinates", Context.MODE_PRIVATE);
+
+        double latitude = Double.parseDouble(sharedPreferences.getString("latitude", ""));
+        double longitude = Double.parseDouble(sharedPreferences.getString("longitude", ""));
+
+        LatLng location = new LatLng(latitude, longitude); // User Current Location
+
+        mMap.addMarker(new MarkerOptions().position(location)
+                .title("Current Location")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.motorist)));
+
+        mMap.addCircle(drawCircle(location));
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14));
     }
 
     private void getSafezones(GoogleMap googleMap) {
@@ -167,28 +160,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     LatLng safezone_location = new LatLng(latitude, longitude); // Safezone Current Location
 
                     if(service_information_type.contains("repair")){
+
                         mMap.addMarker(new MarkerOptions().position(safezone_location)
                                 .title(shop_name)
+                                .snippet(owner)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.repair)));
+
+
                     }else if(service_information_type.contains("gasoline_shop")){
+
                         mMap.addMarker(new MarkerOptions().position(safezone_location)
                                 .title(shop_name)
+                                .snippet(owner)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.gasoline)));
+
                     }else if(service_information_type.contains("police_station")){
+
                         mMap.addMarker(new MarkerOptions().position(safezone_location)
                                 .title(shop_name)
+                                .snippet(owner)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.police)));
+
                     }else if(service_information_type.contains("hospital")){
+
                         mMap.addMarker(new MarkerOptions().position(safezone_location)
                                 .title(shop_name)
+                                .snippet(owner)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.hospital)));
+
                     }else if(service_information_type.contains("towing")){
+
                         mMap.addMarker(new MarkerOptions().position(safezone_location)
                                 .title(shop_name)
+                                .snippet(owner)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.towing)));
+
+
                     }else if(service_information_type.contains("vulcanizing")){
+
                         mMap.addMarker(new MarkerOptions().position(safezone_location)
                                 .title(shop_name)
+                                .snippet(owner)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.vulcanizing)));
                     }
 
