@@ -11,6 +11,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -39,6 +41,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+
         mapFragment.getMapAsync(this);
 
         dbRef = FirebaseDatabase.getInstance().getReference();
@@ -88,7 +91,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         double longitude = Double.parseDouble(sharedPreferences.getString("longitude", ""));
 
         LatLng location = new LatLng(latitude, longitude); // User Current Location
-        mMap.addMarker(new MarkerOptions().position(location).title("Current Location"));
+
+        mMap.addMarker(new MarkerOptions().position(location)
+                .title("Current Location")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.motorist)));
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14));
     }
@@ -105,6 +112,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
                     currentUserLocation(googleMap);
+                    getSafezones(googleMap);
                 }
             });
         }else{
@@ -151,9 +159,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                      * with type of safezone.
                      */
                     LatLng safezone_location = new LatLng(latitude, longitude); // Safezone Current Location
-                    mMap.addMarker(new MarkerOptions().position(safezone_location).title(shop_name));
-//                    mMap.moveCamera(CameraUpdateFactory.newLatLng(safezone_location));
-//                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(safezone_location, 16));
+
+                    if(service_information_type.contains("repair")){
+                        mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                .title(shop_name)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.repair)));
+                    }else if(service_information_type.contains("gasoline_shop")){
+                        mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                .title(shop_name)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.gasoline)));
+                    }else if(service_information_type.contains("police_station")){
+                        mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                .title(shop_name)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.police)));
+                    }else if(service_information_type.contains("hospital")){
+                        mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                .title(shop_name)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.hospital)));
+                    }else if(service_information_type.contains("towing")){
+                        mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                .title(shop_name)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.towing)));
+                    }else if(service_information_type.contains("vulcanizing")){
+                        mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                .title(shop_name)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.vulcanizing)));
+                    }
+
 
                 }
 
