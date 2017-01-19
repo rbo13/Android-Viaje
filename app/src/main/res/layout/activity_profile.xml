@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_profile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,11 +9,175 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/app_color"
     tools:context="com.app.viaje.viaje.ProfileActivity">
 
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/logout_button"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/action_logout"
+        android:textColorHint="#ffffff"
+        android:background="@drawable/rounded_button"
+        android:layout_marginTop="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profilePic_id"
+        android:layout_width="@dimen/activity_horizontal_margin_xlg"
+        android:layout_height="@dimen/activity_vertical_margin_xlg"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#FF000000"
+        android:src="@drawable/profile"
+        android:layout_below="@+id/logout_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="62dp" />
+
+
     <TextView
+        android:id="@+id/full_name_text_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PROFILE ACTIVITY"/>
+        android:hint="FULL NAME HERE"
+        android:layout_below="@+id/profilePic_id"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/activity_vertical_margin_md"/>
+
+    <TextView
+        android:id="@+id/plate_number_text_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="PLATE NUMBER HERE"
+        android:layout_below="@+id/full_name_text_id"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/activity_vertical_margin_md"/>
+
+    <TextView
+        android:id="@+id/email_text_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="EMAIL HERE"
+        android:layout_below="@+id/plate_number_text_id"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/activity_vertical_margin_md"/>
+
+    <TextView
+        android:id="@+id/contact_number_text_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="CONTACT NUMBER"
+        android:layout_below="@+id/email_text_id"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/activity_vertical_margin_md"/>
+
+    <TextView
+        android:id="@+id/address_text_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="ADDRESS HERE"
+        android:layout_below="@+id/contact_number_text_id"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/activity_vertical_margin_md"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginRight="13dp"
+        android:layout_marginEnd="13dp"
+        android:layout_marginTop="19dp"
+        android:layout_below="@+id/full_name_text_id"
+        android:layout_toLeftOf="@+id/plate_number_text_id"
+        android:layout_toStartOf="@+id/plate_number_text_id">
+
+        <ImageView
+            android:id="@+id/plate_number_img_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_plate"
+            android:layout_marginRight="11dp"
+            android:layout_marginEnd="11dp" />
+
+        <ImageView
+            android:id="@+id/email_img_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_mail" />
+
+
+        <ImageView
+            android:id="@+id/contact_img_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_contact" />
+
+        <ImageView
+            android:id="@+id/address_img_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_address"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/edit_profile_pic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_pencil"
+        android:layout_alignBottom="@+id/profilePic_id"
+        android:layout_toRightOf="@+id/plate_number_text_id"
+        android:layout_toEndOf="@+id/plate_number_text_id"
+        android:layout_marginLeft="25dp"
+        android:layout_marginStart="25dp" />
+
+    <ImageView
+        android:id="@+id/edit_profile_full_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_pencil"
+        android:layout_below="@+id/edit_profile_pic"
+        android:layout_alignLeft="@+id/edit_profile_pic"
+        android:layout_alignStart="@+id/edit_profile_pic"
+        android:layout_marginTop="12dp" />
+
+    <ImageView
+        android:id="@+id/edit_profile_plate_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_pencil"
+        android:layout_below="@+id/edit_profile_full_name"
+        android:layout_alignLeft="@+id/edit_profile_full_name"
+        android:layout_alignStart="@+id/edit_profile_full_name" />
+
+    <ImageView
+        android:id="@+id/edit_profile_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_pencil"
+        android:layout_below="@+id/edit_profile_plate_number"
+        android:layout_alignLeft="@+id/edit_profile_plate_number"
+        android:layout_alignStart="@+id/edit_profile_plate_number" />
+
+    <ImageView
+        android:id="@+id/edit_profile_contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_pencil"
+        android:layout_below="@+id/edit_profile_email"
+        android:layout_alignLeft="@+id/edit_profile_email"
+        android:layout_alignStart="@+id/edit_profile_email" />
+
+    <ImageView
+        android:id="@+id/edit_profile_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_pencil"
+        android:layout_below="@+id/edit_profile_contact"
+        android:layout_alignLeft="@+id/edit_profile_contact"
+        android:layout_alignStart="@+id/edit_profile_contact"
+        android:layout_marginTop="11dp" />
+
 
 </RelativeLayout>

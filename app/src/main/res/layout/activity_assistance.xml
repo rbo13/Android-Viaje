@@ -8,11 +8,75 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/app_color"
     tools:context="com.app.viaje.viaje.AssistanceActivity">
+
+
+    <Button
+        android:text="@string/service_type_towing"
+        android:layout_width="@dimen/activity_horizontal_margin_xlg"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tire_service_button"
+        android:layout_alignLeft="@+id/tire_service_button"
+        android:layout_alignStart="@+id/tire_service_button"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/rounded_button"
+        android:textColor="#fff"
+        android:id="@+id/towing_service_button" />
+
+    <Button
+        android:text="@string/service_type_battery_boost"
+        android:layout_width="@dimen/activity_horizontal_margin_xlg"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fuel_delivery_service_button"
+        android:layout_alignLeft="@+id/fuel_delivery_service_button"
+        android:layout_alignStart="@+id/fuel_delivery_service_button"
+        android:layout_marginTop="26dp"
+        android:background="@drawable/rounded_button"
+        android:textColor="#fff"
+        android:id="@+id/battery_boost_service_button" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ASSISTANCE ACTIVITY"/>
+        android:text="@string/choose_action"
+        android:textColor="#fff"
+        android:textSize="@dimen/font_size_default_m"
+        android:id="@+id/textView"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="44dp" />
+
+    <Button
+        android:text="@string/service_type_fuel_delivery"
+        android:layout_width="@dimen/activity_horizontal_margin_xlg"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="29dp"
+        android:id="@+id/fuel_delivery_service_button"
+        android:layout_below="@+id/towing_service_button"
+        android:layout_alignLeft="@+id/towing_service_button"
+        android:layout_alignStart="@+id/towing_service_button"
+        android:background="@drawable/rounded_button"
+        android:textColor="#fff"/>
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/back_to_menu_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/emergency_color"
+        android:textColor="#ffffff"
+        android:text="@string/back_to_main_menu"/>
+
+    <Button
+        android:text="@string/service_type_tire_service"
+        android:layout_width="@dimen/activity_horizontal_margin_xlg"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="62dp"
+        android:background="@drawable/rounded_button"
+        android:textColor="#fff"
+        android:id="@+id/tire_service_button"
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
