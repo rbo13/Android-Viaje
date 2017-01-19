@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         /**
          * Update the single login user
          * at firebase "online_users" record at
-         * a give time of 1 minute.
+         * a given time of 1 minute.
          */
         if(mFirebaseUser != null){
 
@@ -277,36 +277,35 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
         String email_address = sharedPreferences.getString("email", "");
 
-        dbRef = FirebaseDatabase.getInstance().getReference()
-                .child(ViajeConstants.ONLINE_USERS_KEY);
+        final Query queryRef = dbRef.child(ViajeConstants.ONLINE_USERS_KEY)
+                .orderByChild(ViajeConstants.MOTORIST_EMAIL_ADDRESS_KEY)
+                .equalTo(email_address);
 
         if(mFirebaseUser != null){
 
-            dbRef.orderByChild(ViajeConstants.MOTORIST_EMAIL_ADDRESS_KEY)
-                    .equalTo(email_address)
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+            queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            String key = "";
+                    String key = "";
 
-                            for (DataSnapshot nodeDataSnapshot : dataSnapshot.getChildren()){
-                                key = nodeDataSnapshot.getKey();
-                            }
+                    for (DataSnapshot nodeDataSnapshot : dataSnapshot.getChildren()){
+                        key = nodeDataSnapshot.getKey();
+                    }
 
-                            HashMap<String, Object> updated_online_user = new HashMap<>();
-                            updated_online_user.put("latitude", latitude);
-                            updated_online_user.put("longitude", longitude);
+                    HashMap<String, Object> updated_online_user = new HashMap<>();
+                    updated_online_user.put("latitude", latitude);
+                    updated_online_user.put("longitude", longitude);
 
-                            dbRef.child(key).updateChildren(updated_online_user);
+                    queryRef.getRef().child(key).updateChildren(updated_online_user);
+                }
 
-                        }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e("ERROR:", "onCancelled", databaseError.toException());
+                }
+            });
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Log.e("ERROR:", "onCancelled", databaseError.toException());
-                        }
-                    });
         }
     }
 
