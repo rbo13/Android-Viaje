@@ -139,12 +139,39 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
 
     private void saveMotoristInfo() {
 
-        SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
+        String email_address = emailField.getText().toString().trim();
 
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("email", emailField.getText().toString());
-        editor.putString("password", passwordField.getText().toString());
-        editor.apply();
+
+
+        Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
+                .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
+                .equalTo(email_address);
+
+
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot motoristSnapshot : dataSnapshot.getChildren()){
+
+                    Motorist motorist = motoristSnapshot.getValue(Motorist.class);
+
+                    SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("email", motorist.getEmail_address());
+                    editor.putString("type", motorist.getType());
+                    editor.putString("password", passwordField.getText().toString().trim());
+                    editor.apply();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                Log.w("ERROR: ", "loadPost:onCancelled", databaseError.toException());
+            }
+        });
 
         Toast.makeText(this, "Saved..", Toast.LENGTH_SHORT).show();
 
