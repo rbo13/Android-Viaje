@@ -2,10 +2,12 @@ package com.app.viaje.viaje;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,10 +25,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.larvalabs.svgandroid.SVG;
+import com.larvalabs.svgandroid.SVGParser;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import helpers.ViajeConstants;
+import models.Motorist;
 import models.Safezone;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -35,12 +46,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private DatabaseReference dbRef;
 
+    ArrayList<Safezone> safezones = new ArrayList<>();
     GPSTracker gps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -124,6 +139,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14));
+
+
     }
 
     private void getSafezones(GoogleMap googleMap) {
@@ -138,74 +155,172 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                for (DataSnapshot safezoneSnapshot : dataSnapshot.getChildren()){
+                if(dataSnapshot != null && dataSnapshot.getValue() != null) {
 
-                    Safezone safezone = safezoneSnapshot.getValue(Safezone.class);
+                    Map<String, Safezone> td = new HashMap<String, Safezone>();
 
-                    double latitude = safezone.getAddress().getLatitude();
-                    double longitude = safezone.getAddress().getLongitude();
-                    String address = safezone.getAddress().getAddress();
-                    String contact_number = safezone.getContact_number();
-                    String email_address = safezone.getEmail_address();
-                    String owner = safezone.getOwner();
-                    String service_information_type = safezone.getService_information_type();
-                    String shop_name = safezone.getShop_name();
-                    String type = safezone.getType();
-                    String username = safezone.getUsername();
+                    for(DataSnapshot safezoneSnapshot : dataSnapshot.getChildren()){
 
-                    /**
-                     * Create marker in maps
-                     * with type of safezone.
-                     */
-                    LatLng safezone_location = new LatLng(latitude, longitude); // Safezone Current Location
-
-                    if(service_information_type.contains("repair")){
-
-                        mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                .title(shop_name)
-                                .snippet(owner)
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.repair)));
-
-
-                    }else if(service_information_type.contains("gasoline_shop")){
-
-                        mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                .title(shop_name)
-                                .snippet(owner)
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.gasoline)));
-
-                    }else if(service_information_type.contains("police_station")){
-
-                        mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                .title(shop_name)
-                                .snippet(owner)
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.police)));
-
-                    }else if(service_information_type.contains("hospital")){
-
-                        mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                .title(shop_name)
-                                .snippet(owner)
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.hospital)));
-
-                    }else if(service_information_type.contains("towing")){
-
-                        mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                .title(shop_name)
-                                .snippet(owner)
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.towing)));
-
-
-                    }else if(service_information_type.contains("vulcanizing")){
-
-                        mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                .title(shop_name)
-                                .snippet(owner)
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.vulcanizing)));
+                        Safezone safezone = safezoneSnapshot.getValue(Safezone.class);
+                        td.put(safezoneSnapshot.getKey(), safezone);
                     }
 
+                    ArrayList<Safezone> values = new ArrayList<>(td.values());
+                    List<String> keys = new ArrayList<String>(td.keySet());
 
-                }
+                    Log.d("BITO: ", td.toString());
+
+                    for(Safezone safezone : values){
+
+                        String str_latitude = String.valueOf(safezone.getAddress().getLatitude());
+                        String str_longitude = String.valueOf(safezone.getAddress().getLongitude());
+
+                        Log.d("FIREBASE SAFEZONE/LONG:", str_latitude);
+                        Log.d("FIREBASE SAFEZONE/LAT:", str_longitude);
+
+
+                        double latitude = safezone.getAddress().getLatitude();
+                        double longitude = safezone.getAddress().getLongitude();
+                        String address = safezone.getAddress().getAddress();
+                        String contact_number = safezone.getContact_number();
+                        String email_address = safezone.getEmail_address();
+                        String owner = safezone.getOwner();
+                        String service_information_type = safezone.getService_information_type();
+                        String shop_name = safezone.getShop_name();
+                        String type = safezone.getType();
+                        String username = safezone.getUsername();
+
+//                        Toast.makeText(MapsActivity.this, "Owner: "+owner, Toast.LENGTH_LONG).show();
+
+                        /**
+                         * Create marker in maps
+                         * with type of safezone.
+                         */
+                        LatLng safezone_location = new LatLng(latitude, longitude); // Safezone Current Location
+
+                        if(service_information_type.equals("repair")){
+
+                            mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                    .title(shop_name)
+                                    .snippet(owner)
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.repair)));
+
+                        }else if(service_information_type.equals("gasoline_shop")){
+
+                            mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                    .title(shop_name)
+                                    .snippet(owner)
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.gasoline)));
+
+                        }else if(service_information_type.equals("police_station")){
+
+                            mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                    .title(shop_name)
+                                    .snippet(owner)
+                                    .icon(BitmapDescriptorFactory.fromResource(R.raw.police)));
+
+                        }else if(service_information_type.equals("hospital")){
+
+                            mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                    .title(shop_name)
+                                    .snippet(owner)
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.hospital)));
+
+                        }else if(service_information_type.equals("towing")){
+
+                            mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                    .title(shop_name)
+                                    .snippet(owner)
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.towing)));
+
+
+                        }else if(service_information_type.equals("vulcanizing")){
+
+                            mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                    .title(shop_name)
+                                    .snippet(owner)
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.vulcanizing)));
+                        }
+
+                    }
+
+//                    safezones.add((Safezone)dataSnapshot.getChildren());
+//                    for (int i = 0; i < safezones.size(); i++){
+//
+//                        Toast.makeText(MapsActivity.this, safezones.get(i).getEmail_address(), Toast.LENGTH_SHORT).show();
+//                    }
+
+//                    for (DataSnapshot safezoneSnapshot : dataSnapshot.getChildren()){
+//
+//                        Safezone safezone = safezoneSnapshot.getValue(Safezone.class);
+//
+//                        double latitude = safezone.getAddress().getLatitude();
+//                        double longitude = safezone.getAddress().getLongitude();
+//                        String address = safezone.getAddress().getAddress();
+//                        String contact_number = safezone.getContact_number();
+//                        String email_address = safezone.getEmail_address();
+//                        String owner = safezone.getOwner();
+//                        String service_information_type = safezone.getService_information_type();
+//                        String shop_name = safezone.getShop_name();
+//                        String type = safezone.getType();
+//                        String username = safezone.getUsername();
+//
+//                        Toast.makeText(MapsActivity.this, "Owner: "+owner, Toast.LENGTH_LONG).show();
+//
+//                        /**
+//                         * Create marker in maps
+//                         * with type of safezone.
+//                         */
+//                        LatLng safezone_location = new LatLng(latitude, longitude); // Safezone Current Location
+//
+//                        if(service_information_type.contains("repair")){
+//
+//                            mMap.addMarker(new MarkerOptions().position(safezone_location)
+//                                    .title(shop_name)
+//                                    .snippet(owner)
+//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.repair)));
+//
+//
+//                        }else if(service_information_type.contains("gasoline_shop")){
+//
+//                            mMap.addMarker(new MarkerOptions().position(safezone_location)
+//                                    .title(shop_name)
+//                                    .snippet(owner)
+//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.gasoline)));
+//
+//                        }else if(service_information_type.contains("police_station")){
+//
+//                            mMap.addMarker(new MarkerOptions().position(safezone_location)
+//                                    .title(shop_name)
+//                                    .snippet(owner)
+//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.police)));
+//
+//                        }else if(service_information_type.contains("hospital")){
+//
+//                            mMap.addMarker(new MarkerOptions().position(safezone_location)
+//                                    .title(shop_name)
+//                                    .snippet(owner)
+//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.hospital)));
+//
+//                        }else if(service_information_type.contains("towing")){
+//
+//                            mMap.addMarker(new MarkerOptions().position(safezone_location)
+//                                    .title(shop_name)
+//                                    .snippet(owner)
+//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.towing)));
+//
+//
+//                        }else if(service_information_type.contains("vulcanizing")){
+//
+//                            mMap.addMarker(new MarkerOptions().position(safezone_location)
+//                                    .title(shop_name)
+//                                    .snippet(owner)
+//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.vulcanizing)));
+//                        }
+//
+//                    }
+
+                } //end if
 
             }
 
@@ -222,9 +337,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         options.center(location);
         options.radius(1500);
-        options.fillColor(ContextCompat.getColor(getApplicationContext(), R.color.app_color));
+        options.fillColor(Color.argb(10, 0, R.color.app_color, 0));
         options.strokeColor(ContextCompat.getColor(getApplicationContext(), R.color.stroke_color));
-        options.strokeWidth(10);
+        options.strokeWidth(5);
 
         return options;
     }
