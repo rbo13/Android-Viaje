@@ -40,7 +40,7 @@
         android:id="@+id/full_name_text_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="FULL NAME HERE"
+
         android:layout_below="@+id/profilePic_id"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/activity_vertical_margin_md"/>
@@ -49,7 +49,7 @@
         android:id="@+id/plate_number_text_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="PLATE NUMBER HERE"
+
         android:layout_below="@+id/full_name_text_id"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/activity_vertical_margin_md"/>
@@ -58,7 +58,7 @@
         android:id="@+id/email_text_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="EMAIL HERE"
+
         android:layout_below="@+id/plate_number_text_id"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/activity_vertical_margin_md"/>
@@ -67,7 +67,7 @@
         android:id="@+id/contact_number_text_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="CONTACT NUMBER"
+
         android:layout_below="@+id/email_text_id"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/activity_vertical_margin_md"/>
@@ -76,7 +76,7 @@
         android:id="@+id/address_text_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="ADDRESS HERE"
+
         android:layout_below="@+id/contact_number_text_id"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/activity_vertical_margin_md"/>

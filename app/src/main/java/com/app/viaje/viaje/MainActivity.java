@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -17,11 +19,13 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,14 +43,17 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import helpers.ViajeConstants;
 import models.Emergency;
+import models.Motorist;
 import models.OnlineUser;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
@@ -70,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     String lat, lon;
+
+    //Butterknife
+    @BindView(R.id.profilePic) ImageView profilePic;
 
     //GPSTracker Service
     GPSTracker gps;
@@ -100,6 +110,41 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onStart();
 
         mGoogleApiClient.connect();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
+        String email_address = sharedPreferences.getString("email", "");
+
+        final Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
+                .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
+                .equalTo(email_address);
+
+        if(mFirebaseUser != null){
+
+            queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    for (DataSnapshot userDataSnapshot : dataSnapshot.getChildren()){
+
+                        Motorist motorist = userDataSnapshot.getValue(Motorist.class);
+
+                        try {
+                            Bitmap image = decodeFromFirebase64(motorist.getProfile_pic());
+                            profilePic.setImageBitmap(image);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e("ERROR:", "onCancelled", databaseError.toException());
+                }
+            });
+
+        }
     }
 
     @Override
@@ -401,6 +446,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
             dialog.show();
         }
+    }
+
+    private Bitmap decodeFromFirebase64(String image) throws IOException{
+
+        byte[] decodedByteArray = android.util.Base64.decode(image, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
     }
 
     /**

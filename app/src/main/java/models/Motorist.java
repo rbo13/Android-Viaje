@@ -19,12 +19,13 @@ public class Motorist {
     private String vehicle_information_plate_number;
     private String vehicle_information_vehicle_type;
     private String type;
+    private String profile_pic;
 
 
 
     public Motorist() {  }
 
-    public Motorist(String motorist_id, String username, String email_address, String family_name, String given_name, String contact_number, String address, String license_number, String vehicle_information_model_year, String vehicle_information_plate_number, String vehicle_information_vehicle_type, String type, String key) {
+    public Motorist(String motorist_id, String username, String email_address, String family_name, String given_name, String contact_number, String address, String license_number, String vehicle_information_model_year, String vehicle_information_plate_number, String vehicle_information_vehicle_type, String type, String profile_pic, String key) {
         this.motorist_id = motorist_id;
         this.username = username;
         this.email_address = email_address;
@@ -37,6 +38,7 @@ public class Motorist {
         this.vehicle_information_plate_number = vehicle_information_plate_number;
         this.vehicle_information_vehicle_type = vehicle_information_vehicle_type;
         this.type = type;
+        this.profile_pic = profile_pic;
     }
 
     public String getMotorist_id() {
@@ -133,5 +135,13 @@ public class Motorist {
 
     public void setVehicle_information_vehicle_type(String vehicle_information_vehicle_type) {
         this.vehicle_information_vehicle_type = vehicle_information_vehicle_type;
+    }
+
+    public String getProfile_pic() {
+        return profile_pic;
+    }
+
+    public void setProfile_pic(String profile_pic) {
+        this.profile_pic = profile_pic;
     }
 }

@@ -141,8 +141,6 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
 
         String email_address = emailField.getText().toString().trim();
 
-
-
         Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
                 .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
                 .equalTo(email_address);
@@ -159,8 +157,12 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
                     SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("email", motorist.getEmail_address());
+                    editor.putString("plate_number", motorist.getVehicle_information_plate_number());
+                    editor.putString("given_name", motorist.getGiven_name());
+                    editor.putString("family_name", motorist.getFamily_name());
+                    editor.putString("contact_number", motorist.getContact_number());
+                    editor.putString("address", motorist.getAddress());
                     editor.putString("type", motorist.getType());
-                    editor.putString("password", passwordField.getText().toString().trim());
                     editor.apply();
                 }
 
