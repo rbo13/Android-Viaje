@@ -8,5 +8,6 @@
 
     <color name="app_color">#14AB85</color>
     <color name="app_color_button">#107D61</color>
+    <color name="stroke_color">#00796b</color>
     <color name="emergency_color">#191919</color>
 </resources>
