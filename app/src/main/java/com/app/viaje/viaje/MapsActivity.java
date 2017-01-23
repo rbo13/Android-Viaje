@@ -190,7 +190,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String type = safezone.getType();
                         String username = safezone.getUsername();
 
-//                        Toast.makeText(MapsActivity.this, "Owner: "+owner, Toast.LENGTH_LONG).show();
+                        Toast.makeText(MapsActivity.this, "Owner: "+owner, Toast.LENGTH_LONG).show();
 
                         /**
                          * Create marker in maps

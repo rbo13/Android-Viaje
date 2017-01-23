@@ -465,6 +465,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
          * at firebase.
          */
         deleteUserRecordOnFirebase();
+        SharedPreferences motoristInfo = getApplicationContext().getSharedPreferences("motoristInfo", MODE_PRIVATE);
+        motoristInfo.edit().clear().apply();
     }
 
     @OnClick(R.id.emergency_button_id)

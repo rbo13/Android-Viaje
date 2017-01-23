@@ -160,6 +160,7 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
                     editor.putString("plate_number", motorist.getVehicle_information_plate_number());
                     editor.putString("given_name", motorist.getGiven_name());
                     editor.putString("family_name", motorist.getFamily_name());
+                    editor.putString("full_name", motorist.getGiven_name()+", "+motorist.getFamily_name());
                     editor.putString("contact_number", motorist.getContact_number());
                     editor.putString("address", motorist.getAddress());
                     editor.putString("type", motorist.getType());

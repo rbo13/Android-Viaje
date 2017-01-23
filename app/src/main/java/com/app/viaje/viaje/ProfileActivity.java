@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,11 +48,21 @@ public class ProfileActivity extends AppCompatActivity {
 
     //Butterknife
     @BindView(R.id.profilePic_id) ImageView profilePic;
+    @BindView(R.id.edit_profile_full_name) ImageView updateFullName;
+    @BindView(R.id.update_profile_name_image) ImageView checkMark;
+
+
     @BindView(R.id.full_name_text_id) TextView full_name_text;
     @BindView(R.id.plate_number_text_id) TextView plate_number_text;
     @BindView(R.id.email_text_id) TextView email_text;
     @BindView(R.id.contact_number_text_id) TextView contact_number_text;
     @BindView(R.id.address_text_id) TextView address_text;
+
+    @BindView(R.id.update_full_name_edit) EditText fullNameUpdate;
+    @BindView(R.id.update_plate_number_edit) EditText plateNumberUpdate;
+    @BindView(R.id.update_email_edit) EditText emailUpdate;
+    @BindView(R.id.update_contact_edit) EditText contactNumberUpdate;
+    @BindView(R.id.update_address_edit) EditText addressUpdate;
 
 
     @Override
@@ -61,6 +73,7 @@ public class ProfileActivity extends AppCompatActivity {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         dbRef = FirebaseDatabase.getInstance().getReference();
+
 
         ButterKnife.bind(this);
     }
@@ -81,10 +94,20 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void displayUserInformation(){
 
+        /**
+         * Hide the EditText onStart.
+         */
+        fullNameUpdate.setVisibility(View.GONE);
+        plateNumberUpdate.setVisibility(View.GONE);
+        emailUpdate.setVisibility(View.GONE);
+        contactNumberUpdate.setVisibility(View.GONE);
+        addressUpdate.setVisibility(View.GONE);
+        checkMark.setVisibility(View.GONE);
+
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
 
         String email_address = sharedPreferences.getString("email", "");
-        String full_name = sharedPreferences.getString("given_name", "") + ", " + sharedPreferences.getString("family_name", "");
+        String full_name = sharedPreferences.getString("full_name", "");
         String plate_number = sharedPreferences.getString("plate_number", "");
         String contact_number = sharedPreferences.getString("contact_number", "");
         String address = sharedPreferences.getString("address", "");
@@ -245,6 +268,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
+
     private Bitmap decodeFromFirebase64(String image) throws IOException{
 
         byte[] decodedByteArray = android.util.Base64.decode(image, Base64.DEFAULT);
@@ -259,47 +283,44 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
-    private void showAlertEditFullName() {
-
-    }
 
     private void editProfileFullName() {
-//        Toast.makeText(ProfileActivity.this, "Update Profile Picture", Toast.LENGTH_SHORT).show();
-//
-//        SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
-//        String email_address = sharedPreferences.getString("email", "");
-//
-//        final Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
-//                .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
-//                .equalTo(email_address);
-//
-//        if(mFirebaseUser != null){
-//
-//            queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//
-//                    String key = "";
-//
-//                    for (DataSnapshot nodeDataSnapshot : dataSnapshot.getChildren()){
-//                        key = nodeDataSnapshot.getKey();
-//                    }
-//
-//                    HashMap<String, Object> updated_profile_pic = new HashMap<>();
-//                    updated_profile_pic.put("given_name", );
-//
-//
-//
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//                    Log.e("ERROR:", "onCancelled", databaseError.toException());
-//                }
-//            });
-//
-//        }
+        Toast.makeText(ProfileActivity.this, "Update Profile Full Name", Toast.LENGTH_SHORT).show();
+
+
+        SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
+        String email_address = sharedPreferences.getString("email", "");
+
+        final Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
+                .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
+                .equalTo(email_address);
+
+        if(mFirebaseUser != null){
+
+            queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                    String key = "";
+
+                    for (DataSnapshot nodeDataSnapshot : dataSnapshot.getChildren()){
+                        key = nodeDataSnapshot.getKey();
+                    }
+
+                    HashMap<String, Object> updated_profile_full_name = new HashMap<>();
+                    updated_profile_full_name.put("full_name", fullNameUpdate.getText().toString().trim());
+                    queryRef.getRef().child(key).updateChildren(updated_profile_full_name);
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e("ERROR:", "onCancelled", databaseError.toException());
+                }
+            });
+
+        }
     }
 
     private void loadLoginView(){
@@ -325,6 +346,31 @@ public class ProfileActivity extends AppCompatActivity {
     @OnClick(R.id.edit_profile_full_name)
     void onEditProfileFullName() {
 
-        showAlertEditFullName();
+        Toast.makeText(ProfileActivity.this, "Update Profile", Toast.LENGTH_LONG).show();
+
+        fullNameUpdate.setVisibility(View.VISIBLE);
+        full_name_text.setVisibility(View.INVISIBLE);
+        updateFullName.setVisibility(View.INVISIBLE);
+        checkMark.setVisibility(View.VISIBLE);
+
     }
+
+    //Update User at firebase
+    @OnClick(R.id.update_profile_name_image)
+    void editFullName() {
+
+        Toast.makeText(ProfileActivity.this, "Update at Firebase", Toast.LENGTH_LONG).show();
+        fullNameUpdate.setVisibility(View.GONE);
+        full_name_text.setVisibility(View.VISIBLE);
+        updateFullName.setVisibility(View.VISIBLE);
+        checkMark.setVisibility(View.GONE);
+
+        SharedPreferences sharedPreferencesUpdatedMotoristInfo = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferencesUpdatedMotoristInfo.edit();
+        editor.putString("full_name", fullNameUpdate.getText().toString().trim());
+        editor.apply();
+
+        editProfileFullName();
+    }
+
 }
