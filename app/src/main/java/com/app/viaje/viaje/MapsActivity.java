@@ -168,16 +168,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     ArrayList<Safezone> values = new ArrayList<>(td.values());
                     List<String> keys = new ArrayList<String>(td.keySet());
 
-                    Log.d("BITO: ", td.toString());
-
                     for(Safezone safezone : values){
-
-                        String str_latitude = String.valueOf(safezone.getAddress().getLatitude());
-                        String str_longitude = String.valueOf(safezone.getAddress().getLongitude());
-
-                        Log.d("FIREBASE SAFEZONE/LONG:", str_latitude);
-                        Log.d("FIREBASE SAFEZONE/LAT:", str_longitude);
-
 
                         double latitude = safezone.getAddress().getLatitude();
                         double longitude = safezone.getAddress().getLongitude();
@@ -198,48 +189,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                          */
                         LatLng safezone_location = new LatLng(latitude, longitude); // Safezone Current Location
 
-                        if(service_information_type.equals("repair")){
+                        switch (service_information_type){
 
-                            mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                    .title(shop_name)
-                                    .snippet(owner)
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.repair)));
+                            case "repair":
+                                mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                        .title(shop_name)
+                                        .snippet(owner)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.repair)));
+                                break;
 
-                        }else if(service_information_type.equals("gasoline_shop")){
+                            case "gasoline":
+                                mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                        .title(shop_name)
+                                        .snippet(owner)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.gasoline)));
+                                break;
 
-                            mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                    .title(shop_name)
-                                    .snippet(owner)
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.gasoline)));
+                            case "police_station":
+                                mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                        .title(shop_name)
+                                        .snippet(owner)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.raw.police)));
+                                break;
 
-                        }else if(service_information_type.equals("police_station")){
+                            case "hospital":
+                                mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                        .title(shop_name)
+                                        .snippet(owner)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.hospital)));
+                                break;
 
-                            mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                    .title(shop_name)
-                                    .snippet(owner)
-                                    .icon(BitmapDescriptorFactory.fromResource(R.raw.police)));
+                            case "towing":
+                                mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                        .title(shop_name)
+                                        .snippet(owner)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.towing)));
+                                break;
 
-                        }else if(service_information_type.equals("hospital")){
-
-                            mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                    .title(shop_name)
-                                    .snippet(owner)
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.hospital)));
-
-                        }else if(service_information_type.equals("towing")){
-
-                            mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                    .title(shop_name)
-                                    .snippet(owner)
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.towing)));
-
-
-                        }else if(service_information_type.equals("vulcanizing")){
-
-                            mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                    .title(shop_name)
-                                    .snippet(owner)
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.vulcanizing)));
+                            case "vulcanizing":
+                                mMap.addMarker(new MarkerOptions().position(safezone_location)
+                                        .title(shop_name)
+                                        .snippet(owner)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.vulcanizing)));
+                                break;
                         }
 
                     }
