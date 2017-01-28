@@ -10,4 +10,9 @@
     <color name="app_color_button">#00796b</color>
     <color name="emergency_color">#191919</color>
     <color name="stroke_color">#00897b</color>
+
+    <color name="pin_button_color">#3e3d3d</color>
+
+    <color name="white_color">#ffffff</color>
+
 </resources>

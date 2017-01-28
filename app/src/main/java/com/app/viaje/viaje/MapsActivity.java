@@ -1,6 +1,7 @@
 package com.app.viaje.viaje;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
@@ -36,6 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import helpers.ViajeConstants;
 import models.Motorist;
 import models.Safezone;
@@ -54,7 +57,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-
+        ButterKnife.bind(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -236,82 +239,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     }
 
-//                    safezones.add((Safezone)dataSnapshot.getChildren());
-//                    for (int i = 0; i < safezones.size(); i++){
-//
-//                        Toast.makeText(MapsActivity.this, safezones.get(i).getEmail_address(), Toast.LENGTH_SHORT).show();
-//                    }
-
-//                    for (DataSnapshot safezoneSnapshot : dataSnapshot.getChildren()){
-//
-//                        Safezone safezone = safezoneSnapshot.getValue(Safezone.class);
-//
-//                        double latitude = safezone.getAddress().getLatitude();
-//                        double longitude = safezone.getAddress().getLongitude();
-//                        String address = safezone.getAddress().getAddress();
-//                        String contact_number = safezone.getContact_number();
-//                        String email_address = safezone.getEmail_address();
-//                        String owner = safezone.getOwner();
-//                        String service_information_type = safezone.getService_information_type();
-//                        String shop_name = safezone.getShop_name();
-//                        String type = safezone.getType();
-//                        String username = safezone.getUsername();
-//
-//                        Toast.makeText(MapsActivity.this, "Owner: "+owner, Toast.LENGTH_LONG).show();
-//
-//                        /**
-//                         * Create marker in maps
-//                         * with type of safezone.
-//                         */
-//                        LatLng safezone_location = new LatLng(latitude, longitude); // Safezone Current Location
-//
-//                        if(service_information_type.contains("repair")){
-//
-//                            mMap.addMarker(new MarkerOptions().position(safezone_location)
-//                                    .title(shop_name)
-//                                    .snippet(owner)
-//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.repair)));
-//
-//
-//                        }else if(service_information_type.contains("gasoline_shop")){
-//
-//                            mMap.addMarker(new MarkerOptions().position(safezone_location)
-//                                    .title(shop_name)
-//                                    .snippet(owner)
-//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.gasoline)));
-//
-//                        }else if(service_information_type.contains("police_station")){
-//
-//                            mMap.addMarker(new MarkerOptions().position(safezone_location)
-//                                    .title(shop_name)
-//                                    .snippet(owner)
-//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.police)));
-//
-//                        }else if(service_information_type.contains("hospital")){
-//
-//                            mMap.addMarker(new MarkerOptions().position(safezone_location)
-//                                    .title(shop_name)
-//                                    .snippet(owner)
-//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.hospital)));
-//
-//                        }else if(service_information_type.contains("towing")){
-//
-//                            mMap.addMarker(new MarkerOptions().position(safezone_location)
-//                                    .title(shop_name)
-//                                    .snippet(owner)
-//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.towing)));
-//
-//
-//                        }else if(service_information_type.contains("vulcanizing")){
-//
-//                            mMap.addMarker(new MarkerOptions().position(safezone_location)
-//                                    .title(shop_name)
-//                                    .snippet(owner)
-//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.vulcanizing)));
-//                        }
-//
-//                    }
-
                 } //end if
 
             }
@@ -334,6 +261,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         options.strokeWidth(5);
 
         return options;
+    }
+
+    private void createMarkerBasedOnLocation() {
+
+        SharedPreferences sharedPreferences = getSharedPreferences("userCoordinates", Context.MODE_PRIVATE);
+
+        double latitude = Double.parseDouble(sharedPreferences.getString("latitude", ""));
+        double longitude = Double.parseDouble(sharedPreferences.getString("longitude", ""));
+
+        LatLng safezone_location = new LatLng(latitude, longitude); // Safezone Current Location
+
+        mMap.addMarker(new MarkerOptions().position(safezone_location)
+                .title("Current Location")
+                .snippet("Your Location")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.motorist)));
+    }
+
+    //Butterknife Components
+    @OnClick(R.id.create_pin_id)
+    void onCreatePin() {
+
+        Toast.makeText(MapsActivity.this, "Create a Pin", Toast.LENGTH_SHORT).show();
+        createMarkerBasedOnLocation();
+    }
+
+    @OnClick(R.id.back_to_menu_id)
+    void onBackToMenu() {
+
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
     }
 
 }
