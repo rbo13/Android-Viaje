@@ -103,12 +103,12 @@ public class Safezone {
             return address;
         }
 
-        public double getLatitude() {
+        public double getLat() {
 
             return lat;
         }
 
-        public double getLongitude() {
+        public double getLng() {
 
             return lng;
         }

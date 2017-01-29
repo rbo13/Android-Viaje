@@ -173,8 +173,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     for(Safezone safezone : values){
 
-                        double latitude = safezone.getAddress().getLatitude();
-                        double longitude = safezone.getAddress().getLongitude();
+                        double latitude = safezone.getAddress().getLat();
+                        double longitude = safezone.getAddress().getLng();
                         String address = safezone.getAddress().getAddress();
                         String contact_number = safezone.getContact_number();
                         String email_address = safezone.getEmail_address();
