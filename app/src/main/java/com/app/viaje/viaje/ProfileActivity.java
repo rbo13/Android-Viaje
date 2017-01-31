@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -59,6 +60,9 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseUser mFirebaseUser;
     private DatabaseReference dbRef;
 
+    //Caching
+    private LruCache<String, String> imageCache;
+
     private Uri imageCaptureUri;
     InputStream inputStream;
 
@@ -100,11 +104,16 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        ButterKnife.bind(this);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         dbRef = FirebaseDatabase.getInstance().getReference();
-        ButterKnife.bind(this);
+
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = maxMemory / 8;
+
+        imageCache = new LruCache<>(cacheSize);
 
         config.put("cloud_name", ViajeConstants.CLOUD_NAME);
         config.put("api_key", ViajeConstants.API_KEY);
@@ -115,8 +124,8 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        displayUserInformation();
 
+        displayUserInformation();
     }
 
     @Override
@@ -135,7 +144,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         Bitmap bitmap = null;
         String path = "";
-
 
         if(requestCode == PICK_FROM_GALLERY) {
             imageCaptureUri = data.getData();
@@ -212,6 +220,7 @@ public class ProfileActivity extends AppCompatActivity {
         String full_name = sharedPreferences.getString("full_name", "");
         String plate_number = sharedPreferences.getString("plate_number", "");
         String contact_number = sharedPreferences.getString("contact_number", "");
+        String profile_pic = sharedPreferences.getString("profile_pic", "");
         String address = sharedPreferences.getString("address", "");
 
         //Display to TextView.
@@ -221,34 +230,45 @@ public class ProfileActivity extends AppCompatActivity {
         contact_number_text.setText(contact_number);
         address_text.setText(address);
 
-        final Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
-                .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
-                .equalTo(email_address);
+        if(imageCache.get(email_address) != null) {
 
-        if(mFirebaseUser != null){
+            Picasso.with(getApplicationContext()).load(profile_pic).into(profilePic);
+        }else {
 
-            queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+            final Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
+                    .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
+                    .equalTo(email_address);
 
-                    for (DataSnapshot userDataSnapshot : dataSnapshot.getChildren()){
+            if(mFirebaseUser != null){
 
-                        Motorist motorist = userDataSnapshot.getValue(Motorist.class);
+                queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String imageUrl = motorist.getProfile_pic();
-                        Log.d("IMAGE_URL: ", imageUrl);
+                        for (DataSnapshot userDataSnapshot : dataSnapshot.getChildren()){
 
-                        Picasso.with(getApplicationContext()).load(imageUrl).into(profilePic);
+                            Motorist motorist = userDataSnapshot.getValue(Motorist.class);
+
+                            String imageUrl = motorist.getProfile_pic();
+                            String email = motorist.getEmail_address();
+                            Log.d("IMAGE_URL: ", imageUrl);
+
+                            imageCache.put(email, imageUrl);
+
+                            Picasso.with(getApplicationContext()).load(imageUrl).into(profilePic);
+                        }
                     }
-                }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.e("ERROR:", "onCancelled", databaseError.toException());
-                }
-            });
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e("ERROR:", "onCancelled", databaseError.toException());
+                    }
+                });
 
+            }
         }
+
+
     }
 
     private void deleteUserRecordOnFirebase() {
@@ -311,6 +331,8 @@ public class ProfileActivity extends AppCompatActivity {
                     SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
                     String email_address = sharedPreferences.getString("email", "");
 
+                    imageCache.put(email_address, url);
+
                     final Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
                             .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
                             .equalTo(email_address);
@@ -349,8 +371,6 @@ public class ProfileActivity extends AppCompatActivity {
         };
 
         new Thread(runnable).start();
-
-
 
     }
 
@@ -393,7 +413,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void editProfileFullName() {
         Toast.makeText(ProfileActivity.this, "Update Profile Full Name", Toast.LENGTH_SHORT).show();
-
 
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
         String email_address = sharedPreferences.getString("email", "");

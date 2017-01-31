@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -55,6 +56,8 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
     protected EditText emailField;
     protected EditText passwordField;
 
+    private LruCache<String, String> imageCache;
+
     Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -75,8 +78,6 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
 
         buildGoogleApiClient();
 
-        ButterKnife.bind(this);
-
         dbRef = FirebaseDatabase.getInstance().getReference();
 
         signupTextView = (TextView) findViewById(R.id.signUpText);
@@ -86,6 +87,12 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
 
         mFirebaseAuth = FirebaseAuth.getInstance();
 
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = maxMemory / 8;
+
+        imageCache = new LruCache<>(cacheSize);
+
+        ButterKnife.bind(this);
     }
 
     @Override
@@ -106,36 +113,6 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
 
         mGoogleApiClient.disconnect();
     }
-
-    /**
-      private void getSingleMotoristFromFirebase() {
-
-        String email_address = emailField.getText().toString().trim();
-
-        Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
-                .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
-                .equalTo(email_address);
-
-
-        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                Motorist motorist = dataSnapshot.getValue(Motorist.class);
-
-                String email = motorist.getEmail_address();
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-                Log.w("ERROR: ", "loadPost:onCancelled", databaseError.toException());
-            }
-        });
-
-    }
-    **/
 
     private void saveMotoristInfo() {
 
@@ -166,6 +143,8 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
                     editor.putString("address", motorist.getAddress());
                     editor.putString("type", motorist.getType());
                     editor.apply();
+
+                    imageCache.put(motorist.getEmail_address(), motorist.getProfile_pic());
                 }
 
             }

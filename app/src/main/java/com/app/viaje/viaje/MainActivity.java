@@ -21,6 +21,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -72,6 +73,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private DatabaseReference dbRef;
     private EditText email;
 
+    //Caching
+    private LruCache<String, String> imageCache;
+
     private LocationManager locationManager;
     private LocationListener locationListener;
 
@@ -95,17 +99,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         buildGoogleApiClient();
 
-        ButterKnife.bind(this);
-
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         dbRef = FirebaseDatabase.getInstance().getReference();
+
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = maxMemory / 8;
+
+        imageCache = new LruCache<>(cacheSize);
 
         if(mFirebaseUser == null){
             // Not logged-in.
             loadLoginView();
         }
+
+        ButterKnife.bind(this);
     }
+
 
     @Override
     protected void onStart() {
@@ -113,34 +123,48 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         mGoogleApiClient.connect();
 
+        displayProfilePic();
+    }
+
+    private void displayProfilePic() {
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
         String email_address = sharedPreferences.getString("email", "");
         final String sharedPrefProfilePic = sharedPreferences.getString("profile_pic", "");
 
-        final Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
-                .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
-                .equalTo(email_address);
+        if(imageCache.get(email_address) != null){
 
-        if(mFirebaseUser != null){
+            Picasso.with(getApplicationContext()).load(sharedPrefProfilePic).into(profilePic);
+        }else {
 
-            queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+            final Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
+                    .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
+                    .equalTo(email_address);
 
-                    for (DataSnapshot userDataSnapshot : dataSnapshot.getChildren()){
+            if(mFirebaseUser != null){
 
-                        Motorist motorist = userDataSnapshot.getValue(Motorist.class);
+                queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String profile_pic = motorist.getProfile_pic();
-                        Picasso.with(getApplicationContext()).load(profile_pic).into(profilePic);
+                        for (DataSnapshot userDataSnapshot : dataSnapshot.getChildren()){
+
+                            Motorist motorist = userDataSnapshot.getValue(Motorist.class);
+
+                            String profile_pic = motorist.getProfile_pic();
+                            String email = motorist.getEmail_address();
+
+                            imageCache.put(email, profile_pic);
+                            Picasso.with(getApplicationContext()).load(profile_pic).into(profilePic);
+                        }
                     }
-                }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.e("ERROR:", "onCancelled", databaseError.toException());
-                }
-            });
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e("ERROR:", "onCancelled", databaseError.toException());
+                    }
+                });
+
+            }
 
         }
     }
@@ -155,6 +179,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onPause() {
         super.onPause();
+
+        displayProfilePic();
 
         timer = new Timer();
 
