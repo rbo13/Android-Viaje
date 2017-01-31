@@ -177,8 +177,11 @@ public class SignUpActivity extends AppCompatActivity {
         editor.putString("full_name", givenName + ", " + familyName);
         editor.putString("contact_number", contactNumber);
         editor.putString("address", user_address);
+        editor.putString("profile_pic", "http://hotscope.tv/files/default-profile.png");
         editor.putString("type", "motorist");
         editor.apply();
+
+
     }
 
 }

@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
         String email_address = sharedPreferences.getString("email", "");
+        final String sharedPrefProfilePic = sharedPreferences.getString("profile_pic", "");
 
         final Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
                 .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
@@ -132,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                         String profile_pic = motorist.getProfile_pic();
                         Picasso.with(getApplicationContext()).load(profile_pic).into(profilePic);
-
                     }
                 }
 

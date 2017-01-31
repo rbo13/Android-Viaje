@@ -23,6 +23,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -32,15 +34,22 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import helpers.CloudinaryClient;
+import helpers.CloudinaryConfiguration;
 import helpers.ViajeConstants;
 import models.Motorist;
 
@@ -51,6 +60,11 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseReference dbRef;
 
     private Uri imageCaptureUri;
+    InputStream inputStream;
+
+    Cloudinary cloudinary;
+    Map config = new HashMap();
+
     private static final int PICK_FROM_CAMERA = 1;
     private static final int PICK_FROM_GALLERY = 2;
 
@@ -90,9 +104,12 @@ public class ProfileActivity extends AppCompatActivity {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         dbRef = FirebaseDatabase.getInstance().getReference();
-
-
         ButterKnife.bind(this);
+
+        config.put("cloud_name", ViajeConstants.CLOUD_NAME);
+        config.put("api_key", ViajeConstants.API_KEY);
+        config.put("api_secret", ViajeConstants.API_SECRET);
+        cloudinary = new Cloudinary(config);
     }
 
     @Override
@@ -113,10 +130,12 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+
         if(resultCode != RESULT_OK) return;
 
         Bitmap bitmap = null;
         String path = "";
+
 
         if(requestCode == PICK_FROM_GALLERY) {
             imageCaptureUri = data.getData();
@@ -124,11 +143,30 @@ public class ProfileActivity extends AppCompatActivity {
 
             if(path == null) path = imageCaptureUri.getPath();
 
-            if(path != null) bitmap = BitmapFactory.decodeFile(path);
+            if(path != null) {
+                bitmap = BitmapFactory.decodeFile(path);
+
+                try {
+                    inputStream = new FileInputStream(path);
+                    updateProfilePictureFieldAtFirebase(inputStream);
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+            }
 
         }else {
             path = imageCaptureUri.getPath();
             bitmap = BitmapFactory.decodeFile(path);
+
+            try{
+                inputStream = new FileInputStream(path);
+                updateProfilePictureFieldAtFirebase(inputStream);
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
 
         profilePic.setImageBitmap(bitmap);
@@ -138,6 +176,7 @@ public class ProfileActivity extends AppCompatActivity {
     public String getRealPathFromUri(Uri contentUri) {
         String[] proj = {MediaStore.Images.Media.DATA};
 
+        @SuppressWarnings("deprecation")
         Cursor cursor = managedQuery(contentUri, proj, null, null, null);
 
         if(cursor == null) return null;
@@ -196,13 +235,10 @@ public class ProfileActivity extends AppCompatActivity {
 
                         Motorist motorist = userDataSnapshot.getValue(Motorist.class);
 
-//                        try {
-//                            Bitmap image = decodeFromFirebase64(motorist.getProfile_pic());
-//                            profilePic.setImageBitmap(image);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
+                        String imageUrl = motorist.getProfile_pic();
+                        Log.d("IMAGE_URL: ", imageUrl);
 
+                        Picasso.with(getApplicationContext()).load(imageUrl).into(profilePic);
                     }
                 }
 
@@ -253,15 +289,74 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
 
-//    private void updateProfilePicture(final Bitmap bitmap) {
-//
-//
-//
-//    }
+    private void updateProfilePictureFieldAtFirebase(final InputStream is) {
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+
+                try{
+                    /**
+                     * Cloudinary function to get the
+                     * newly uploaded image to cloudinary.
+                     */
+                    Map uploadResult = cloudinary.uploader().upload(is, ObjectUtils.emptyMap());
+                    final String url = (String) uploadResult.get("url");
+                    Log.d("IMAGE_URL", url);
+
+                    /**
+                     * Get Shared Preferences and update the
+                     * 'profile_pic' at Firebase.
+                     */
+                    SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
+                    String email_address = sharedPreferences.getString("email", "");
+
+                    final Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
+                            .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
+                            .equalTo(email_address);
+
+                    if(mFirebaseUser != null){
+
+                        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                                String key = "";
+
+                                for (DataSnapshot nodeDataSnapshot : dataSnapshot.getChildren()){
+                                    key = nodeDataSnapshot.getKey();
+                                }
+
+                                HashMap<String, Object> updated_profile_pic = new HashMap<>();
+                                updated_profile_pic.put("profile_pic", url);
+                                queryRef.getRef().child(key).updateChildren(updated_profile_pic);
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.e("ERROR:", "onCancelled", databaseError.toException());
+                            }
+                        });
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        new Thread(runnable).start();
+
+
+
+    }
 
     private void selectImageFromGalleryOrCapturePhoto() {
 
-        final String[] items = new String[] { "Camera", "Gallery" };
+        final String[] items = new String[] { "From Camera", "From Gallery" };
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.select_dialog_item, items);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select Image");

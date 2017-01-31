@@ -161,6 +161,7 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
                     editor.putString("given_name", motorist.getGiven_name());
                     editor.putString("family_name", motorist.getFamily_name());
                     editor.putString("full_name", motorist.getGiven_name()+", "+motorist.getFamily_name());
+                    editor.putString("profile_pic", motorist.getProfile_pic());
                     editor.putString("contact_number", motorist.getContact_number());
                     editor.putString("address", motorist.getAddress());
                     editor.putString("type", motorist.getType());
