@@ -11,16 +11,18 @@ public class Emergency {
     private double latitude;
     private double longitude;
     private String description;
+    private String safezoneType;
 
 
     public Emergency() {  }
 
-    public Emergency(String email, String status, double latitude, double longitude, String description) {
+    public Emergency(String email, String status, double latitude, double longitude, String description, String safezoneType) {
         this.email = email;
         this.status = status;
         this.latitude = latitude;
         this.longitude = longitude;
         this.description = description;
+        this.safezoneType = safezoneType;
     }
 
     public String getEmail() {
@@ -61,5 +63,13 @@ public class Emergency {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getSafezoneType() {
+        return safezoneType;
+    }
+
+    public void setSafezoneType(String safezoneType) {
+        this.safezoneType = safezoneType;
     }
 }

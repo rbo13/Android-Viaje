@@ -205,8 +205,59 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         startActivity(intent);
     }
 
-    private void sendEmergencyHelp() {
+    private void sendSafezoneHelp() {
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Safezones");
+        builder.setItems(new CharSequence[]
+                {
+                 "Hospital", "Towing", "Gasoline Station",
+                 "Repair", "Police Station", "Vulcanizing"
+                },
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        switch (which) {
+
+                            case 0:
+                                Toast.makeText(getApplicationContext(), "Send to Hospital", Toast.LENGTH_LONG).show();
+                                sendEmergencyHelpToSafezone("Hospital Emergency!", "hospital");
+                                break;
+
+                            case 1:
+                                Toast.makeText(getApplicationContext(), "Send to Towing", Toast.LENGTH_LONG).show();
+                                sendEmergencyHelpToSafezone("Need help, car has been towed!", "towing");
+                                break;
+
+                            case 2:
+                                Toast.makeText(getApplicationContext(), "Send to Gasoline Station", Toast.LENGTH_LONG).show();
+                                sendEmergencyHelpToSafezone("Out of Gas. In the middle of nowhere!", "gasoline");
+                                break;
+
+                            case 3:
+                                Toast.makeText(getApplicationContext(), "Send to Repair", Toast.LENGTH_LONG).show();
+                                sendEmergencyHelpToSafezone("Need repair!", "repair");
+                                break;
+
+                            case 4:
+                                Toast.makeText(getApplicationContext(), "Send to Police Station", Toast.LENGTH_LONG).show();
+                                sendEmergencyHelpToSafezone("Police! Help!", "police");
+                                break;
+
+                            case 5:
+                                Toast.makeText(getApplicationContext(), "Send to Vulcanizing", Toast.LENGTH_LONG).show();
+                                sendEmergencyHelpToSafezone("Flat tire. No spare tire!", "vulcanizing");
+                                break;
+                        }
+                    }
+        });
+
+        builder.create().show();
+
+    }
+
+    private void sendEmergencyHelpToSafezone(String emergencyDescription, String safezoneType) {
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
@@ -222,10 +273,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             Emergency emergency = new Emergency();
 
             emergency.setEmail(email);
-            emergency.setDescription("50/50");
+            emergency.setDescription(emergencyDescription);
             emergency.setStatus("pending");
             emergency.setLatitude(latitude);
             emergency.setLongitude(longitude);
+            emergency.setSafezoneType(safezoneType);
 
             dbRef.child(ViajeConstants.EMERGENCIES_KEY).push().setValue(emergency);
             //Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
@@ -233,7 +285,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }else{
             gps.showSettingsAlert();
         }
-
     }
 
     @Override
@@ -436,7 +487,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     Toast.makeText(MainActivity.this, "Send Help!", Toast.LENGTH_SHORT).show();
-                    sendEmergencyHelp();
+                    sendSafezoneHelp();
                 }
             });
 
@@ -463,15 +514,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @OnClick(R.id.emergency_button_id)
     void onEmergencyClick(){
+//        Snackbar snackbar = Snackbar.make(coordinatorLayout, "Help is coming!", Snackbar.LENGTH_LONG);
+//        View sbView = snackbar.getView();
+//        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+//        textView.setTextColor(Color.RED);
+//
+//        snackbar.show();
 
-        Snackbar snackbar = Snackbar.make(coordinatorLayout, "Help is coming!", Snackbar.LENGTH_LONG);
-        View sbView = snackbar.getView();
-        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setTextColor(Color.RED);
-
-        snackbar.show();
-
-        sendEmergencyHelp();
+        sendSafezoneHelp();
     }
 
     @OnClick(R.id.to_map_button_id)
