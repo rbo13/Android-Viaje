@@ -1,6 +1,8 @@
 package com.app.viaje.viaje;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -151,12 +153,32 @@ public class SignUpActivity extends AppCompatActivity {
         motorist.setVehicle_information_plate_number(plateNumber);
         motorist.setVehicle_information_model_year(modelYear);
         motorist.setVehicle_information_vehicle_type(vehicleType);
+        motorist.setProfile_pic("http://hotscope.tv/files/default-profile.png");
 
         motorist.setType("motorist");
 
         dbRef.child(ViajeConstants.USERS_KEY).push().setValue(motorist);
 
+        /**
+         * Save motorist to Shared Preference.
+         */
+        saveToSharedPreference(email, familyName, givenName, contactNumber, user_address, plateNumber);
+
         Toast.makeText(this, "Information Saved...", Toast.LENGTH_LONG).show();
+    }
+
+    private void saveToSharedPreference(String email, String familyName, String givenName, String contactNumber, String user_address, String plateNumber) {
+        SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("email", email);
+        editor.putString("plate_number", plateNumber);
+        editor.putString("given_name", givenName);
+        editor.putString("family_name", familyName);
+        editor.putString("full_name", givenName + ", " + familyName);
+        editor.putString("contact_number", contactNumber);
+        editor.putString("address", user_address);
+        editor.putString("type", "motorist");
+        editor.apply();
     }
 
 }

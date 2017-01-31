@@ -22,4 +22,13 @@ public class ViajeConstants {
      * URLS:
      */
     public static final String ONLINE_USERS_URL_ON_FIREBASE = "https://viaje-app.firebaseio.com/online_users";
+
+
+    /**
+     * Cloudinary:
+     */
+    public static final String CLOUD_NAME = "whaangbuu";
+    public static final String API_KEY = "591541527659158";
+    public static final String API_SECRET = "BpYoq2mgj7xCSH85Ffm2B-lT0OQ";
+
 }

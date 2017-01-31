@@ -42,8 +42,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -128,12 +130,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                         Motorist motorist = userDataSnapshot.getValue(Motorist.class);
 
-                        try {
-                            Bitmap image = decodeFromFirebase64(motorist.getProfile_pic());
-                            profilePic.setImageBitmap(image);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        String profile_pic = motorist.getProfile_pic();
+                        Picasso.with(getApplicationContext()).load(profile_pic).into(profilePic);
 
                     }
                 }
@@ -446,12 +444,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
             dialog.show();
         }
-    }
-
-    private Bitmap decodeFromFirebase64(String image) throws IOException{
-
-        byte[] decodedByteArray = android.util.Base64.decode(image, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
     }
 
     /**

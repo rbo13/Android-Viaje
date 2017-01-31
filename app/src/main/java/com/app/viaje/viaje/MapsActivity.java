@@ -1,10 +1,19 @@
 package com.app.viaje.viaje;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -184,8 +193,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String type = safezone.getType();
                         String username = safezone.getUsername();
 
-                        Toast.makeText(MapsActivity.this, "Owner: "+owner, Toast.LENGTH_LONG).show();
-
                         /**
                          * Create marker in maps
                          * with type of safezone.
@@ -195,6 +202,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         switch (service_information_type){
 
                             case "repair":
+
                                 mMap.addMarker(new MarkerOptions().position(safezone_location)
                                         .title(shop_name)
                                         .snippet(owner)
@@ -255,7 +263,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         CircleOptions options = new CircleOptions();
 
         options.center(location);
-        options.radius(1500);
+        options.radius(1600);
         options.fillColor(Color.argb(10, 0, R.color.app_color, 0));
         options.strokeColor(ContextCompat.getColor(getApplicationContext(), R.color.stroke_color));
         options.strokeWidth(5);

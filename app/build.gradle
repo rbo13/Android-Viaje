@@ -41,4 +41,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
     compile files('libs/svg-android-2.0.1.jar')
+    compile files('libs/cloudinary-android-1.2.2.jar')
 }

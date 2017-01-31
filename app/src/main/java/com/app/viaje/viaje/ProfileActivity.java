@@ -2,11 +2,14 @@ package com.app.viaje.viaje;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,11 +17,13 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -29,6 +34,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -44,7 +50,9 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseUser mFirebaseUser;
     private DatabaseReference dbRef;
 
-    private static final int SELECT_PICTURE = 1;
+    private Uri imageCaptureUri;
+    private static final int PICK_FROM_CAMERA = 1;
+    private static final int PICK_FROM_GALLERY = 2;
 
     //Butterknife
     @BindView(R.id.profilePic_id) ImageView profilePic;
@@ -101,6 +109,44 @@ public class ProfileActivity extends AppCompatActivity {
 //        displayUserInformation();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode != RESULT_OK) return;
+
+        Bitmap bitmap = null;
+        String path = "";
+
+        if(requestCode == PICK_FROM_GALLERY) {
+            imageCaptureUri = data.getData();
+            path = getRealPathFromUri(imageCaptureUri);
+
+            if(path == null) path = imageCaptureUri.getPath();
+
+            if(path != null) bitmap = BitmapFactory.decodeFile(path);
+
+        }else {
+            path = imageCaptureUri.getPath();
+            bitmap = BitmapFactory.decodeFile(path);
+        }
+
+        profilePic.setImageBitmap(bitmap);
+
+    }
+
+    public String getRealPathFromUri(Uri contentUri) {
+        String[] proj = {MediaStore.Images.Media.DATA};
+
+        Cursor cursor = managedQuery(contentUri, proj, null, null, null);
+
+        if(cursor == null) return null;
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+
+        return cursor.getString(column_index);
+    }
+
     private void displayUserInformation(){
 
         /**
@@ -150,12 +196,12 @@ public class ProfileActivity extends AppCompatActivity {
 
                         Motorist motorist = userDataSnapshot.getValue(Motorist.class);
 
-                        try {
-                            Bitmap image = decodeFromFirebase64(motorist.getProfile_pic());
-                            profilePic.setImageBitmap(image);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+//                        try {
+//                            Bitmap image = decodeFromFirebase64(motorist.getProfile_pic());
+//                            profilePic.setImageBitmap(image);
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
 
                     }
                 }
@@ -206,98 +252,47 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
-        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
-        if (requestCode == SELECT_PICTURE)
-        {
-            if (resultCode == Activity.RESULT_OK)
-            {
-                if (imageReturnedIntent != null)
-                {
-                    try
-                    {
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getApplication().getContentResolver(), imageReturnedIntent.getData());
-                        profilePic.setImageBitmap(bitmap);
-                        updateProfilePicture(bitmap);
-                    } catch (IOException e)
-                    {
-                        e.printStackTrace();
+//    private void updateProfilePicture(final Bitmap bitmap) {
+//
+//
+//
+//    }
+
+    private void selectImageFromGalleryOrCapturePhoto() {
+
+        final String[] items = new String[] { "Camera", "Gallery" };
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.select_dialog_item, items);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Image");
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                if(which == 0) {
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    File file = new File(Environment.getExternalStorageDirectory(), "tmp_avatar" + String.valueOf(System.currentTimeMillis())+".jpg");
+                    imageCaptureUri = Uri.fromFile(file);
+
+                    try{
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageCaptureUri);
+                        intent.putExtra("return data", true);
+                        startActivityForResult(intent, PICK_FROM_CAMERA);
+                    }catch (Exception ex) {
+                        ex.printStackTrace();
                     }
-
+                    dialog.cancel();
+                } else {
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(Intent.createChooser(intent, "Complete Action Using"), PICK_FROM_GALLERY);
                 }
-            } else if (resultCode == Activity.RESULT_CANCELED)
-            {
-                Toast.makeText(getApplication(), "Cancelled", Toast.LENGTH_SHORT).show();
             }
-        }
-    }
+        });
 
-    private void updateProfilePicture(final Bitmap bitmap) {
-
-        Toast.makeText(ProfileActivity.this, "Update Profile Picture", Toast.LENGTH_SHORT).show();
-
-        SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
-        String email_address = sharedPreferences.getString("email", "");
-
-        final Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
-                .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
-                .equalTo(email_address);
-
-        if(mFirebaseUser != null){
-
-            queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-                    String imageEncoded = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
-
-                    String key = "";
-
-                    for (DataSnapshot nodeDataSnapshot : dataSnapshot.getChildren()){
-                        key = nodeDataSnapshot.getKey();
-                    }
-
-                    HashMap<String, Object> updated_profile_pic = new HashMap<>();
-                    updated_profile_pic.put("profile_pic", imageEncoded);
-
-                    try {
-                        Bitmap image = decodeFromFirebase64(imageEncoded);
-                        profilePic.setImageBitmap(image);
-
-                        queryRef.getRef().child(key).updateChildren(updated_profile_pic);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.e("ERROR:", "onCancelled", databaseError.toException());
-                }
-            });
-
-        }
-
-    }
-
-
-    private Bitmap decodeFromFirebase64(String image) throws IOException{
-
-        byte[] decodedByteArray = android.util.Base64.decode(image, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
-    }
-
-    private void onSelectImage() {
-
-        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(pickPhoto , SELECT_PICTURE);//one can be replaced with any action code
-
+        final AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 
@@ -479,7 +474,7 @@ public class ProfileActivity extends AppCompatActivity {
     @OnClick(R.id.edit_profile_pic)
     void onEditProfilePic() {
 
-        onSelectImage();
+        selectImageFromGalleryOrCapturePhoto();
 
     }
 

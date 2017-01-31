@@ -76,7 +76,7 @@
         android:layout_height="@dimen/activity_vertical_margin_xlg"
         app:civ_border_width="2dp"
         app:civ_border_color="#FF000000"
-        android:src="@drawable/profile"
+        android:src="@drawable/default_profile"
         android:layout_below="@+id/logout_button"
         android:layout_alignLeft="@+id/to_profile_button_id"
         android:layout_alignStart="@+id/to_profile_button_id"

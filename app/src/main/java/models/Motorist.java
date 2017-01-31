@@ -22,7 +22,6 @@ public class Motorist {
     private String profile_pic;
 
 
-
     public Motorist() {  }
 
     public Motorist(String motorist_id, String username, String email_address, String family_name, String given_name, String contact_number, String address, String license_number, String vehicle_information_model_year, String vehicle_information_plate_number, String vehicle_information_vehicle_type, String type, String profile_pic, String key) {
