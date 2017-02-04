@@ -15,6 +15,8 @@ public class ViajeConstants {
     public static final String EMAIL_ADDRESS_FIELD = "email_address";
     public static final String MOTORIST_FIELD = "motorist";
 
+    public static final String POSTS_KEY = "posts";
+
     public static final String TYPE_FIELD = "type";
     public static final String SAFEZONE = "safezone";
 

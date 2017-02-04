@@ -2,6 +2,7 @@ package com.app.viaje.viaje;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -12,12 +13,16 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -49,7 +54,10 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import helpers.ViajeConstants;
+import models.Emergency;
 import models.Motorist;
+import models.OnlineUser;
+import models.Post;
 import models.Safezone;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -57,6 +65,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
 
     private DatabaseReference dbRef;
+
+    private String textContent;
 
     ArrayList<Safezone> safezones = new ArrayList<>();
     GPSTracker gps;
@@ -286,12 +296,100 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.motorist)));
     }
 
+    private void showMarkerPostDialog() {
+
+        final EditText input = new EditText(MapsActivity.this);
+        //Get the text from EditText.
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        //Create AlertDialog Builder.
+        AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+        builder.setTitle("Post");
+        builder.setMessage("What about the post?");
+        builder.setView(input);
+        builder.setPositiveButton("Post", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                textContent = input.getText().toString();
+                Toast.makeText(MapsActivity.this, "Send it bitch", Toast.LENGTH_LONG).show();
+                sendThePostToFirebase(textContent);
+            }
+        });
+
+        builder.create().show();
+    }
+
+    private void sendThePostToFirebase(final String text) {
+
+        Toast.makeText(MapsActivity.this, text, Toast.LENGTH_LONG).show();
+
+        //Get timestamp
+        Long timestamp_long = System.currentTimeMillis() / 1000;
+        final String timestamp = timestamp_long.toString();
+//
+//        //Shared Preference for Motorist Info.
+        SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
+        String email_address = sharedPreferences.getString("email", "");
+
+//        //Shared Preference for User Coordinates.
+        SharedPreferences userCoordinates = getSharedPreferences("userCoordinates", Context.MODE_PRIVATE);
+        final double latitude = Double.parseDouble(userCoordinates.getString("latitude", ""));
+        final double longitude = Double.parseDouble(userCoordinates.getString("longitude", ""));
+
+        Toast.makeText(MapsActivity.this, "Latitude: "+ userCoordinates.getString("latitude", "")
+                + "Longitude: " + userCoordinates.getString("longitude", "")
+                + "Email: " + email_address
+                + "Timestamp: " + timestamp, Toast.LENGTH_LONG).show();
+
+
+        Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
+                .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
+                .equalTo(email_address);
+
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot motoristSnapshot : dataSnapshot.getChildren()){
+
+
+                    //Get single motorist and pass it to online user.
+                    Motorist motorist = motoristSnapshot.getValue(Motorist.class);
+
+                    /**
+                     * Create Post instance
+                     * to save to "posts"
+                     * at firebase.
+                     */
+                    Post post = new Post();
+
+                    post.setLat(latitude);
+                    post.setLng(longitude);
+                    post.setText(text);
+                    post.setTimestamp(timestamp);
+                    post.setUser(motorist);
+
+                    dbRef.child(ViajeConstants.POSTS_KEY).push().setValue(post);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                Log.w("ERROR: ", "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+
+    }
+
     //Butterknife Components
     @OnClick(R.id.create_pin_id)
     void onCreatePin() {
 
         Toast.makeText(MapsActivity.this, "Create a Pin", Toast.LENGTH_SHORT).show();
-        createMarkerBasedOnLocation();
+        showMarkerPostDialog();
+//        createMarkerBasedOnLocation();
     }
 
     @OnClick(R.id.back_to_menu_id)
