@@ -1,64 +1,55 @@
 package com.app.viaje.viaje;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.VectorDrawable;
-import android.location.Location;
-import android.location.LocationManager;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.graphics.Paint;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.vision.text.Text;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.larvalabs.svgandroid.SVG;
-import com.larvalabs.svgandroid.SVGParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import helpers.ViajeConstants;
-import models.Emergency;
 import models.Motorist;
-import models.OnlineUser;
 import models.Post;
 import models.Safezone;
+
+import static android.R.attr.dialogLayout;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -68,8 +59,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private String textContent;
 
+    TextView post_content = null;
+    TextView date_time = null;
+    TextView postCommentContent = null;
+    TextView postCommentedBy = null;
+    EditText commentContentBody = null;
+
     ArrayList<Safezone> safezones = new ArrayList<>();
     GPSTracker gps;
+
+    @Nullable
+    @BindView(R.id.commentContentID) TextView commentContent;
+    @Nullable
+    @BindView(R.id.commentedByID) TextView commentedBy;
+    @Nullable
+    @BindView(R.id.postContent) TextView postContent;
+    @Nullable
+    @BindView(R.id.postedByID) TextView postedBy;
+    @Nullable
+    @BindView(R.id.timestampID) TextView timestamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +93,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         dbRef = FirebaseDatabase.getInstance().getReference();
+
+
     }
 
     @Override
@@ -110,8 +120,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         gps = new GPSTracker(MapsActivity.this);
 
+        Toast.makeText(MapsActivity.this, "Map Ready..", Toast.LENGTH_SHORT).show();
+
         getSafezones(googleMap);
         currentUserLocation(googleMap);
+        getPosts();
+
     }
 
     private void initMap(){
@@ -128,6 +142,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     currentUserLocation(googleMap);
                     getSafezones(googleMap);
+                    getPosts();
                 }
             });
         }else{
@@ -214,44 +229,57 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             case "repair":
 
                                 mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                        .title(shop_name)
-                                        .snippet(owner)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.repair)));
+                                        .title("safezone")
+                                        .snippet(shop_name + " Owned By: " + owner)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.repair)))
+                                        .setTag("safezone");
+
+//                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "gasoline":
                                 mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                        .title(shop_name)
-                                        .snippet(owner)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.gasoline)));
+                                        .title("safezone")
+                                        .snippet(shop_name + " Owned By: " + owner)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.gasoline)))
+                                        .setTag("safezone");
+//                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "police_station":
                                 mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                        .title(shop_name)
-                                        .snippet(owner)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.raw.police)));
+                                        .title("safezone")
+                                        .snippet(shop_name + " Owned By: " + owner)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.raw.police)))
+                                        .setTag("safezone");
+//                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "hospital":
                                 mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                        .title(shop_name)
-                                        .snippet(owner)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.hospital)));
+                                        .title("safezone")
+                                        .snippet(shop_name + " Owned By: " + owner)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.hospital)))
+                                        .setTag("safezone");
+//                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "towing":
                                 mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                        .title(shop_name)
-                                        .snippet(owner)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.towing)));
+                                        .title("safezone")
+                                        .snippet(shop_name + " Owned By: " + owner)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.towing)))
+                                        .setTag("safezone");
+//                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "vulcanizing":
                                 mMap.addMarker(new MarkerOptions().position(safezone_location)
-                                        .title(shop_name)
-                                        .snippet(owner)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.vulcanizing)));
+                                        .title("safezone")
+                                        .snippet(shop_name + " Owned By: " + owner)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.vulcanizing)))
+                                        .setTag("safezone");
+//                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
                         }
 
@@ -268,18 +296,242 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    private CircleOptions drawCircle(LatLng location){
+    private void getPosts() {
 
-        CircleOptions options = new CircleOptions();
+        Toast.makeText(MapsActivity.this, "Getting all Post..", Toast.LENGTH_SHORT).show();
 
-        options.center(location);
-        options.radius(1600);
-        options.fillColor(Color.argb(10, 0, R.color.app_color, 0));
-        options.strokeColor(ContextCompat.getColor(getApplicationContext(), R.color.stroke_color));
-        options.strokeWidth(5);
+        final Query queryRef = dbRef.child(ViajeConstants.POSTS_KEY);
 
-        return options;
+        queryRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+//                Toast.makeText(MapsActivity.this, dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
+
+                if(dataSnapshot.getValue() != null) {
+
+                    Map<String, Post> td = new HashMap<String, Post>();
+
+                    for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+
+                        Post post = postSnapshot.getValue(Post.class);
+                        td.put(postSnapshot.getKey(), post);
+                    }
+
+                    final ArrayList<Post> values = new ArrayList<>(td.values());
+                    List<String> keys = new ArrayList<String>(td.keySet());
+
+                    for(final Post post : values) {
+                        double lat = post.getLat();
+                        double lng = post.getLng();
+
+                        System.out.println(post);
+
+                        final String postContent = post.getText();
+
+                        final String fullname = post.getUser().getGiven_name()+ ", " + post.getUser().getFamily_name();
+
+                        LatLng location = new LatLng(lat, lng); // User Current Location
+
+                        mMap.addMarker(new MarkerOptions().position(location)
+                                .title("post")
+                                .snippet(postContent)
+                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)))
+                                .setTag("post");
+
+
+                        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                            @Override
+                            public boolean onMarkerClick(Marker marker) {
+
+                                if(marker.getTitle().equals("post")){
+                                    Toast.makeText(MapsActivity.this, "A post has been clicked", Toast.LENGTH_SHORT).show();
+
+                                    LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                                    View dialogLayout = inflater.inflate(R.layout.dialog_layout_comment, null);
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+
+                                    post_content = (TextView) dialogLayout.findViewById(R.id.postContent);
+                                    date_time = (TextView)dialogLayout.findViewById(R.id.timestampID);
+                                    postCommentContent = (TextView) dialogLayout.findViewById(R.id.commentContentID);
+                                    postCommentedBy = (TextView) dialogLayout.findViewById(R.id.commentedByID);
+                                    commentContentBody = (EditText) dialogLayout.findViewById(R.id.post);
+
+                                    //Create StringBuilder to have a new line in every TextView
+                                    StringBuilder sb = new StringBuilder("");
+
+                                    post_content.append(marker.getSnippet());
+                                    post_content.setPaintFlags(post_content.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
+                                    //Get all comment content.
+                                    for (Post.Comment postComment : post.comments.values()) {
+
+                                        String thePostComments = postComment.getText();
+
+                                        sb.append(fullname+ "\n \t \t"+postComment.getText());
+                                        sb.append("\n");
+                                    }
+
+                                    postCommentedBy.setText(sb.toString());
+
+                                    builder.setPositiveButton("Post Comment", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+
+                                            Toast.makeText(MapsActivity.this, commentContentBody.getText(), Toast.LENGTH_LONG).show();
+
+                                        }
+                                    });
+
+                                    builder.setView(dialogLayout);
+                                    builder.create().show();
+
+                                }else {
+
+                                    Toast.makeText(MapsActivity.this, "A safezone has been clicked", Toast.LENGTH_SHORT).show();
+                                }
+
+                                return true;
+                            }
+                        });
+                    }
+
+
+
+
+                } //end if
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+//        queryRef.addChildEventListener(new ChildEventListener() {
+//
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                Toast.makeText(MapsActivity.this, dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+
     }
+
+//    private void showPostCommentOnMarkerClicked(final ArrayList<Post> posts) {
+//
+//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//            @Override
+//            public boolean onMarkerClick(Marker marker) {
+//
+//                Toast.makeText(MapsActivity.this, "Show Alert Dialog to Comment", Toast.LENGTH_SHORT).show();
+//
+//
+//                showPostCommentDialog(posts, marker);
+//
+//                return true;
+//            }
+//        });
+//    }
+
+//    private void showPostCommentDialog(ArrayList<Post> post, Marker marker) {
+//
+//        System.out.print(post);
+//        String postContent = null;
+//        String string_timestamp = null;
+//
+//        StringBuilder postContentStringBuilder = new StringBuilder("");
+//        StringBuilder commentContentStringBuilder = new StringBuilder("");
+//
+//        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        View dialogLayout = inflater.inflate(R.layout.dialog_layout_comment, null);
+//
+//        post_content = (TextView) dialogLayout.findViewById(R.id.postContent);
+//        date_time = (TextView)dialogLayout.findViewById(R.id.timestampID);
+//        postCommentContent = (TextView) dialogLayout.findViewById(R.id.commentContentID);
+//        postCommentedBy = (TextView) dialogLayout.findViewById(R.id.commentedByID);
+//
+//        for (Post p : post){
+//            postContentStringBuilder.append(marker.getSnippet());
+////            postContentStringBuilder.append(p.getTimestamp());
+//            postContentStringBuilder.append("\n");
+////            postContent = p.getText();
+////            string_timestamp = p.getTimestamp();
+//
+//            //Loop all the comments
+//            for (Post.Comment postComment : p.comments.values()) {
+//                System.out.println(postComment.getText());
+//                System.out.println(postComment.getUser().getFamily_name());
+//
+//                commentContentStringBuilder.append(postComment.getText());
+//                commentContentStringBuilder.append(postComment.getUser().getEmail_address());
+//                commentContentStringBuilder.append("\n");
+//
+////                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+////                View dialogLayout = inflater.inflate(R.layout.dialog_layout_comment, null);
+//
+////                TextView post_content = (TextView) dialogLayout.findViewById(R.id.postContent);
+////                TextView date_time = (TextView)dialogLayout.findViewById(R.id.timestampID);
+////                TextView postCommentContent = (TextView) dialogLayout.findViewById(R.id.commentContentID);
+////                TextView postCommentedBy = (TextView) dialogLayout.findViewById(R.id.commentedByID);
+//
+//                post_content.append(postContentStringBuilder.toString());
+////                date_time.append(postContentStringBuilder.toString());
+//                postCommentContent.append(commentContentStringBuilder.toString());
+////                postCommentedBy.append(commentContentStringBuilder.toString());
+//
+//            }
+//        }
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+//        builder.setView(dialogLayout);
+//
+//        builder.create().show();
+//
+//        //Convert timestamp to date.
+//        //TODO: Parse timestamp
+//
+//
+////        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+////        View dialogLayout = inflater.inflate(R.layout.dialog_layout_comment, null);
+////
+////        TextView post_content = (TextView) dialogLayout.findViewById(R.id.postContent);
+////        TextView date_time = (TextView)dialogLayout.findViewById(R.id.timestampID);
+////
+////        post_content.setText(postContent);
+////        date_time.setText(string_timestamp);
+//
+//
+//
+////        AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+////        builder.setView(dialogLayout);
+////
+////        builder.create().show();
+//
+//    }
+
 
     private void createMarkerBasedOnLocation() {
 
@@ -326,21 +578,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Get timestamp
         Long timestamp_long = System.currentTimeMillis() / 1000;
         final String timestamp = timestamp_long.toString();
-//
-//        //Shared Preference for Motorist Info.
+
+        //Shared Preference for Motorist Info.
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
         String email_address = sharedPreferences.getString("email", "");
 
-//        //Shared Preference for User Coordinates.
+        //Shared Preference for User Coordinates.
         SharedPreferences userCoordinates = getSharedPreferences("userCoordinates", Context.MODE_PRIVATE);
         final double latitude = Double.parseDouble(userCoordinates.getString("latitude", ""));
         final double longitude = Double.parseDouble(userCoordinates.getString("longitude", ""));
-
-        Toast.makeText(MapsActivity.this, "Latitude: "+ userCoordinates.getString("latitude", "")
-                + "Longitude: " + userCoordinates.getString("longitude", "")
-                + "Email: " + email_address
-                + "Timestamp: " + timestamp, Toast.LENGTH_LONG).show();
-
 
         Query queryRef = dbRef.child(ViajeConstants.USERS_KEY)
                 .orderByChild(ViajeConstants.EMAIL_ADDRESS_FIELD)
@@ -383,6 +629,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+
+    private CircleOptions drawCircle(LatLng location){
+
+        CircleOptions options = new CircleOptions();
+
+        options.center(location);
+        options.radius(1600);
+        options.fillColor(Color.argb(10, 0, R.color.app_color, 0));
+        options.strokeColor(ContextCompat.getColor(getApplicationContext(), R.color.stroke_color));
+        options.strokeWidth(5);
+
+        return options;
+    }
+
     //Butterknife Components
     @OnClick(R.id.create_pin_id)
     void onCreatePin() {
@@ -398,5 +658,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
     }
+
+//    //In-Line Class for InfoWindowAdapter
+//    class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+//
+//        private final View myContentsView;
+//
+//        MyInfoWindowAdapter() {
+//            myContentsView = getLayoutInflater().inflate(R.layout.dialog_layout_comment, null);
+//        }
+//
+//        @Override
+//        public View getInfoWindow(Marker marker) {
+//            return null;
+//        }
+//
+//        @Override
+//        public View getInfoContents(Marker marker) {
+//
+//            post_content = (TextView) myContentsView.findViewById(R.id.postContent);
+//            date_time = (TextView) myContentsView.findViewById(R.id.timestampID);
+//            postCommentContent = (TextView) myContentsView.findViewById(R.id.commentContentID);
+//            postCommentedBy = (TextView) myContentsView.findViewById(R.id.commentedByID);
+//            commentContentBody = (EditText) myContentsView.findViewById(R.id.post);
+//            return myContentsView;
+//        }
+//    }
 
 }
