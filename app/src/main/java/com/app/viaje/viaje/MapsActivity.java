@@ -306,8 +306,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-//                Toast.makeText(MapsActivity.this, dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
-
                 if(dataSnapshot.getValue() != null) {
 
                     Map<String, Post> td = new HashMap<String, Post>();
@@ -366,8 +364,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     //Get all comment content.
                                     for (Post.Comment postComment : post.comments.values()) {
 
-                                        String thePostComments = postComment.getText();
-
                                         sb.append(fullname+ "\n \t \t"+postComment.getText());
                                         sb.append("\n");
                                     }
@@ -407,36 +403,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
-
-
-
-//        queryRef.addChildEventListener(new ChildEventListener() {
-//
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                Toast.makeText(MapsActivity.this, dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
 
     }
 
