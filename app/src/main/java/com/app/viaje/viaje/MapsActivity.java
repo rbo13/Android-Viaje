@@ -374,7 +374,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
 
-                                            Toast.makeText(MapsActivity.this, commentContentBody.getText(), Toast.LENGTH_LONG).show();
+                                            String comment = commentContentBody.getText().toString();
+
+                                            /**
+                                             * Function declaration that
+                                             * submits post to the
+                                             * firebase database.
+                                             */
+                                            postComment(comment);
 
                                         }
                                     });
@@ -512,6 +519,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .title("Current Location")
                 .snippet("Your Location")
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.motorist)));
+    }
+
+    private void postComment(String commentText) {
+
+        Toast.makeText(MapsActivity.this, commentText, Toast.LENGTH_LONG).show();
     }
 
     private void showMarkerPostDialog() {
