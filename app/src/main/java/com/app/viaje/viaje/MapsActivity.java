@@ -308,18 +308,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 if(dataSnapshot.getValue() != null) {
 
-                    Map<String, Post> td = new HashMap<String, Post>();
+                    for(final DataSnapshot postSnapshot : dataSnapshot.getChildren()){
 
-                    for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
-
-                        Post post = postSnapshot.getValue(Post.class);
-                        td.put(postSnapshot.getKey(), post);
-                    }
-
-                    final ArrayList<Post> values = new ArrayList<>(td.values());
-                    List<String> keys = new ArrayList<String>(td.keySet());
-
-                    for(final Post post : values) {
+                        final Post post = postSnapshot.getValue(Post.class);
                         double lat = post.getLat();
                         double lng = post.getLng();
 
@@ -335,11 +326,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .title("post")
                                 .snippet(postContent)
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)))
-                                .setTag("post");
+                                .setTag(postSnapshot.getKey());
 
                         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                             @Override
-                            public boolean onMarkerClick(Marker marker) {
+                            public boolean onMarkerClick(final Marker marker) {
 
                                 if(marker.getTitle().equals("post")){
                                     Toast.makeText(MapsActivity.this, "A post has been clicked", Toast.LENGTH_SHORT).show();
@@ -380,7 +371,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                              * submits post to the
                                              * firebase database.
                                              */
-                                            postComment(comment);
+                                            postComment(comment, marker.getTag());
 
                                         }
                                     });
@@ -396,10 +387,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 return true;
                             }
                         });
+
                     }
-
-
-
 
                 } //end if
             }
@@ -411,98 +400,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
     }
-
-//    private void showPostCommentOnMarkerClicked(final ArrayList<Post> posts) {
-//
-//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-//            @Override
-//            public boolean onMarkerClick(Marker marker) {
-//
-//                Toast.makeText(MapsActivity.this, "Show Alert Dialog to Comment", Toast.LENGTH_SHORT).show();
-//
-//
-//                showPostCommentDialog(posts, marker);
-//
-//                return true;
-//            }
-//        });
-//    }
-
-//    private void showPostCommentDialog(ArrayList<Post> post, Marker marker) {
-//
-//        System.out.print(post);
-//        String postContent = null;
-//        String string_timestamp = null;
-//
-//        StringBuilder postContentStringBuilder = new StringBuilder("");
-//        StringBuilder commentContentStringBuilder = new StringBuilder("");
-//
-//        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        View dialogLayout = inflater.inflate(R.layout.dialog_layout_comment, null);
-//
-//        post_content = (TextView) dialogLayout.findViewById(R.id.postContent);
-//        date_time = (TextView)dialogLayout.findViewById(R.id.timestampID);
-//        postCommentContent = (TextView) dialogLayout.findViewById(R.id.commentContentID);
-//        postCommentedBy = (TextView) dialogLayout.findViewById(R.id.commentedByID);
-//
-//        for (Post p : post){
-//            postContentStringBuilder.append(marker.getSnippet());
-////            postContentStringBuilder.append(p.getTimestamp());
-//            postContentStringBuilder.append("\n");
-////            postContent = p.getText();
-////            string_timestamp = p.getTimestamp();
-//
-//            //Loop all the comments
-//            for (Post.Comment postComment : p.comments.values()) {
-//                System.out.println(postComment.getText());
-//                System.out.println(postComment.getUser().getFamily_name());
-//
-//                commentContentStringBuilder.append(postComment.getText());
-//                commentContentStringBuilder.append(postComment.getUser().getEmail_address());
-//                commentContentStringBuilder.append("\n");
-//
-////                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-////                View dialogLayout = inflater.inflate(R.layout.dialog_layout_comment, null);
-//
-////                TextView post_content = (TextView) dialogLayout.findViewById(R.id.postContent);
-////                TextView date_time = (TextView)dialogLayout.findViewById(R.id.timestampID);
-////                TextView postCommentContent = (TextView) dialogLayout.findViewById(R.id.commentContentID);
-////                TextView postCommentedBy = (TextView) dialogLayout.findViewById(R.id.commentedByID);
-//
-//                post_content.append(postContentStringBuilder.toString());
-////                date_time.append(postContentStringBuilder.toString());
-//                postCommentContent.append(commentContentStringBuilder.toString());
-////                postCommentedBy.append(commentContentStringBuilder.toString());
-//
-//            }
-//        }
-//
-//        AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
-//        builder.setView(dialogLayout);
-//
-//        builder.create().show();
-//
-//        //Convert timestamp to date.
-//        //TODO: Parse timestamp
-//
-//
-////        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-////        View dialogLayout = inflater.inflate(R.layout.dialog_layout_comment, null);
-////
-////        TextView post_content = (TextView) dialogLayout.findViewById(R.id.postContent);
-////        TextView date_time = (TextView)dialogLayout.findViewById(R.id.timestampID);
-////
-////        post_content.setText(postContent);
-////        date_time.setText(string_timestamp);
-//
-//
-//
-////        AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
-////        builder.setView(dialogLayout);
-////
-////        builder.create().show();
-//
-//    }
 
 
     private void createMarkerBasedOnLocation() {
@@ -520,11 +417,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.motorist)));
     }
 
-    private void postComment(final String commentText) {
+    private void postComment(final String commentText, Object key) {
 
         final Motorist user = new Motorist();
-
-        Toast.makeText(MapsActivity.this, commentText, Toast.LENGTH_LONG).show();
 
         //Get timestamp
         final Long timestamp_long = System.currentTimeMillis() / 1000;
@@ -545,45 +440,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         user.setVehicle_information_vehicle_type(sharedPreferences.getString("vehicle_information_model_type", ""));
         user.setVehicle_information_plate_number(sharedPreferences.getString("vehicle_information_plate_number", ""));
 
+        Post.Comment postComment = new Post.Comment();
 
-        /**
-         * Query for "posts"
-         */
-        Query postCommentQuery = dbRef.child(ViajeConstants.POSTS_KEY);
+        postComment.setText(commentText);
+        postComment.setTimestamp(timestamp_long);
+        postComment.setUser(user);
 
-        postCommentQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                Post.Comment postComment = new Post.Comment();
-
-                postComment.setText(commentText);
-                postComment.setTimestamp(timestamp_long);
-                postComment.setUser(user);
-
-                dbRef.child(ViajeConstants.POSTS_KEY+"/"+dataSnapshot.getKey()+"/comments").push().setValue(postComment);
-
-//                for (DataSnapshot commentSnapshot : dataSnapshot.getChildren()) {
-//
-//                    Post.Comment postComment = commentSnapshot.getValue(Post.Comment.class);
-//
-//                    postComment.setText(commentText);
-//                    postComment.setTimestamp(timestamp_long);
-//                    postComment.setUser(user);
-//
-//                    dbRef.child(ViajeConstants.POSTS_KEY+"/"+commentSnapshot.getKey()+"/comments").push().setValue(postComment);
-//
-//                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-                Log.w("ERROR: ", "loadPost:onCancelled", databaseError.toException());
-            }
-        });
-
+        dbRef.child(ViajeConstants.POSTS_KEY+"/"+key+"/comments").push().setValue(postComment);
 
     }
 
@@ -602,7 +465,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 textContent = input.getText().toString();
-                Toast.makeText(MapsActivity.this, "Send it bitch", Toast.LENGTH_LONG).show();
                 sendThePostToFirebase(textContent);
             }
         });
@@ -611,8 +473,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void sendThePostToFirebase(final String text) {
-
-        Toast.makeText(MapsActivity.this, text, Toast.LENGTH_LONG).show();
 
         //Get timestamp
         final Long timestamp_long = System.currentTimeMillis() / 1000;
