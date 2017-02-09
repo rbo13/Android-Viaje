@@ -337,7 +337,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)))
                                 .setTag("post");
 
-
                         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                             @Override
                             public boolean onMarkerClick(Marker marker) {
@@ -521,9 +520,71 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.motorist)));
     }
 
-    private void postComment(String commentText) {
+    private void postComment(final String commentText) {
+
+        final Motorist user = new Motorist();
 
         Toast.makeText(MapsActivity.this, commentText, Toast.LENGTH_LONG).show();
+
+        //Get timestamp
+        final Long timestamp_long = System.currentTimeMillis() / 1000;
+        final String timestamp = timestamp_long.toString();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
+
+        //Store the data in shared preference to motorist object.
+        user.setAddress(sharedPreferences.getString("address", ""));
+        user.setContact_number(sharedPreferences.getString("contact_number", ""));
+        user.setEmail_address(sharedPreferences.getString("email", ""));
+        user.setFamily_name(sharedPreferences.getString("family_name", ""));
+        user.setGiven_name(sharedPreferences.getString("given_name", ""));
+        user.setLicense_number(sharedPreferences.getString("license_number", ""));
+        user.setType(sharedPreferences.getString("type", ""));
+        user.setUsername(sharedPreferences.getString("username", ""));
+        user.setVehicle_information_model_year(sharedPreferences.getString("vehicle_information_model_year", ""));
+        user.setVehicle_information_vehicle_type(sharedPreferences.getString("vehicle_information_model_type", ""));
+        user.setVehicle_information_plate_number(sharedPreferences.getString("vehicle_information_plate_number", ""));
+
+
+        /**
+         * Query for "posts"
+         */
+        Query postCommentQuery = dbRef.child(ViajeConstants.POSTS_KEY);
+
+        postCommentQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Post.Comment postComment = new Post.Comment();
+
+                postComment.setText(commentText);
+                postComment.setTimestamp(timestamp_long);
+                postComment.setUser(user);
+
+                dbRef.child(ViajeConstants.POSTS_KEY+"/"+dataSnapshot.getKey()+"/comments").push().setValue(postComment);
+
+//                for (DataSnapshot commentSnapshot : dataSnapshot.getChildren()) {
+//
+//                    Post.Comment postComment = commentSnapshot.getValue(Post.Comment.class);
+//
+//                    postComment.setText(commentText);
+//                    postComment.setTimestamp(timestamp_long);
+//                    postComment.setUser(user);
+//
+//                    dbRef.child(ViajeConstants.POSTS_KEY+"/"+commentSnapshot.getKey()+"/comments").push().setValue(postComment);
+//
+//                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                Log.w("ERROR: ", "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+
+
     }
 
     private void showMarkerPostDialog() {
@@ -554,7 +615,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Toast.makeText(MapsActivity.this, text, Toast.LENGTH_LONG).show();
 
         //Get timestamp
-        Long timestamp_long = System.currentTimeMillis() / 1000;
+        final Long timestamp_long = System.currentTimeMillis() / 1000;
         final String timestamp = timestamp_long.toString();
 
         //Shared Preference for Motorist Info.
@@ -590,7 +651,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     post.setLat(latitude);
                     post.setLng(longitude);
                     post.setText(text);
-                    post.setTimestamp(timestamp);
+                    post.setTimestamp(timestamp_long);
                     post.setUser(motorist);
 
                     dbRef.child(ViajeConstants.POSTS_KEY).push().setValue(post);

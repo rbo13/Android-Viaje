@@ -12,19 +12,19 @@ public class Post {
     private double lat;
     private double lng;
     private String text;
-    private String timestamp;
+    private Long timestamp;
     private Motorist user;
 
 
     public Post() {  }
 
-//    public Map<String, Comment> getComments() {
-//        return comments;
-//    }
-//
-//    public void setComments(Map<String, Comment> comments) {
-//        this.comments = comments;
-//    }
+    public Map<String, Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(Map<String, Comment> comments) {
+        this.comments = comments;
+    }
 
     public double getLat() {
         return lat;
@@ -50,11 +50,11 @@ public class Post {
         this.text = text;
     }
 
-    public String getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 

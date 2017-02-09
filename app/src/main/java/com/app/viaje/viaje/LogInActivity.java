@@ -134,12 +134,17 @@ public class LogInActivity extends AppCompatActivity implements GoogleApiClient.
                     SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("email", motorist.getEmail_address());
-                    editor.putString("plate_number", motorist.getVehicle_information_plate_number());
+                    editor.putString("username", motorist.getUsername());
                     editor.putString("given_name", motorist.getGiven_name());
                     editor.putString("family_name", motorist.getFamily_name());
+                    editor.putString("given_name", motorist.getGiven_name());
+                    editor.putString("license_number", motorist.getLicense_number());
                     editor.putString("full_name", motorist.getGiven_name()+", "+motorist.getFamily_name());
                     editor.putString("profile_pic", motorist.getProfile_pic());
                     editor.putString("contact_number", motorist.getContact_number());
+                    editor.putString("vehicle_information_model_year", motorist.getVehicle_information_model_year());
+                    editor.putString("vehicle_information_model_type", motorist.getVehicle_information_vehicle_type());
+                    editor.putString("vehicle_information_plate_number", motorist.getVehicle_information_plate_number());
                     editor.putString("address", motorist.getAddress());
                     editor.putString("type", motorist.getType());
                     editor.apply();

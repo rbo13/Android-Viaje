@@ -218,7 +218,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         String email_address = sharedPreferences.getString("email", "");
         String full_name = sharedPreferences.getString("full_name", "");
-        String plate_number = sharedPreferences.getString("plate_number", "");
+        String plate_number = sharedPreferences.getString("vehicle_information_plate_number", "");
         String contact_number = sharedPreferences.getString("contact_number", "");
         String profile_pic = sharedPreferences.getString("profile_pic", "");
         String address = sharedPreferences.getString("address", "");
