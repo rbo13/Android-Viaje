@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -16,6 +17,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,9 +39,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +51,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import helpers.ViajeConstants;
+import models.Advertisement;
 import models.Motorist;
 import models.Post;
 import models.Safezone;
@@ -56,6 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
 
     private DatabaseReference dbRef;
+    private RelativeLayout relativeLayout;
 
     private String textContent;
 
@@ -65,19 +73,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     TextView postCommentedBy = null;
     EditText commentContentBody = null;
 
+    //Variable to get the image url.
+    private ImageView ads_image;
+    private TextView adText;
+    private TextView adTitle;
+    private TextView shop_name;
+
     ArrayList<Safezone> safezones = new ArrayList<>();
     GPSTracker gps;
-
-    @Nullable
-    @BindView(R.id.commentContentID) TextView commentContent;
-    @Nullable
-    @BindView(R.id.commentedByID) TextView commentedBy;
-    @Nullable
-    @BindView(R.id.postContent) TextView postContent;
-    @Nullable
-    @BindView(R.id.postedByID) TextView postedBy;
-    @Nullable
-    @BindView(R.id.timestampID) TextView timestamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +92,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+
+        relativeLayout = (RelativeLayout) findViewById(R.id.mapsRelativeLayout);
 
         mapFragment.getMapAsync(this);
 
@@ -169,8 +174,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng location = new LatLng(latitude, longitude); // User Current Location
 
         mMap.addMarker(new MarkerOptions().position(location)
-                .title("Current Location")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.motorist)));
+                .title("motorist")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.motorist)))
+                .setTag("motorist");
 
         mMap.addCircle(drawCircle(location));
 
@@ -232,9 +238,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .title("safezone")
                                         .snippet(shop_name + " Owned By: " + owner)
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.repair)))
-                                        .setTag("safezone");
+                                        .setTag(safezone);
 
-//                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
+                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "gasoline":
@@ -242,8 +248,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .title("safezone")
                                         .snippet(shop_name + " Owned By: " + owner)
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.gasoline)))
-                                        .setTag("safezone");
-//                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
+                                        .setTag(safezone);
+                                //mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "police_station":
@@ -251,8 +257,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .title("safezone")
                                         .snippet(shop_name + " Owned By: " + owner)
                                         .icon(BitmapDescriptorFactory.fromResource(R.raw.police)))
-                                        .setTag("safezone");
-//                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
+                                        .setTag(safezone);
+                                //mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "hospital":
@@ -260,8 +266,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .title("safezone")
                                         .snippet(shop_name + " Owned By: " + owner)
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.hospital)))
-                                        .setTag("safezone");
-//                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
+                                        .setTag(safezone);
+                                //mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "towing":
@@ -269,8 +275,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .title("safezone")
                                         .snippet(shop_name + " Owned By: " + owner)
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.towing)))
-                                        .setTag("safezone");
-//                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
+                                        .setTag(safezone);
+                                //mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "vulcanizing":
@@ -278,8 +284,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .title("safezone")
                                         .snippet(shop_name + " Owned By: " + owner)
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.vulcanizing)))
-                                        .setTag("safezone");
-//                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
+                                        .setTag(safezone);
+                                //mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
                         }
 
@@ -308,87 +314,115 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 if(dataSnapshot.getValue() != null) {
 
-                    for(final DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+                    final Map<String, Post> td = new HashMap<String, Post>();
+                    final ArrayList<Post> postValues = new ArrayList<>(td.values());
+                    List<String> keys = new ArrayList<String>(td.keySet());
 
-                        final Post post = postSnapshot.getValue(Post.class);
+                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+
+                        Post post = postSnapshot.getValue(Post.class);
+                        td.put(postSnapshot.getKey(), post);
+
                         double lat = post.getLat();
                         double lng = post.getLng();
+                        String postContent = post.getText();
+                        final String username = post.getUser().getUsername();
 
-                        System.out.println(post);
 
-                        final String postContent = post.getText();
-
-                        final String fullname = post.getUser().getGiven_name()+ ", " + post.getUser().getFamily_name();
-
-                        LatLng location = new LatLng(lat, lng); // User Current Location
+                        LatLng location = new LatLng(lat, lng); //User current location
 
                         mMap.addMarker(new MarkerOptions().position(location)
                                 .title("post")
-                                .snippet(postContent)
+                                .snippet(postSnapshot.getKey())
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)))
-                                .setTag(postSnapshot.getKey());
+                                .setTag(post);
 
                         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                             @Override
                             public boolean onMarkerClick(final Marker marker) {
 
-                                if(marker.getTitle().equals("post")){
-                                    Toast.makeText(MapsActivity.this, "A post has been clicked", Toast.LENGTH_SHORT).show();
+                                if(marker.getTitle().contains("post")) {
 
-                                    LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                                    View dialogLayout = inflater.inflate(R.layout.dialog_layout_comment, null);
+                                    /**
+                                     * Layout Inflater for the
+                                     * alert dialog when a marker
+                                     * has been click
+                                     */
+                                    LayoutInflater inflater = getLayoutInflater();
+                                    View dialogLayout = inflater.inflate(R.layout.dialog_layout_comment, null, false);
                                     AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
-
+                                    //Create StringBuilder to have a new line in every TextView
+                                    StringBuilder sb = new StringBuilder("");
                                     post_content = (TextView) dialogLayout.findViewById(R.id.postContent);
                                     date_time = (TextView)dialogLayout.findViewById(R.id.timestampID);
                                     postCommentContent = (TextView) dialogLayout.findViewById(R.id.commentContentID);
                                     postCommentedBy = (TextView) dialogLayout.findViewById(R.id.commentedByID);
                                     commentContentBody = (EditText) dialogLayout.findViewById(R.id.post);
 
-                                    //Create StringBuilder to have a new line in every TextView
-                                    StringBuilder sb = new StringBuilder("");
+                                    Post p = (Post) marker.getTag();
+                                    System.out.println(p);
 
-                                    post_content.append(marker.getSnippet());
+                                    post_content.append(p.getText());
                                     post_content.setPaintFlags(post_content.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
-                                    //Get all comment content.
-                                    for (Post.Comment postComment : post.comments.values()) {
+                                    /**
+                                     * Loop every entry of p.comments
+                                     * inside the marker.getTag().
+                                     */
+                                    Iterator entries = p.comments.entrySet().iterator();
+                                    while (entries.hasNext()) {
+                                        Map.Entry myEntry = (Map.Entry) entries.next();
+                                        Object key = myEntry.getKey();
+                                        Post.Comment value = (Post.Comment) myEntry.getValue();
 
-                                        sb.append(fullname+ "\n \t \t"+postComment.getText());
+                                        sb.append(username+"\n \t \t"+value.getText());
                                         sb.append("\n");
+
+                                        postCommentedBy.setText(sb.toString());
+
                                     }
-
-                                    postCommentedBy.setText(sb.toString());
-
+                                    //Button that submits a comment to a post.
                                     builder.setPositiveButton("Post Comment", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-
                                             String comment = commentContentBody.getText().toString();
 
                                             /**
                                              * Function declaration that
-                                             * submits post to the
-                                             * firebase database.
+                                             * submits a comment to the 'post'
+                                             * at firebase database.
                                              */
-                                            postComment(comment, marker.getTag());
-
+                                            postComment(comment, marker.getSnippet());
                                         }
                                     });
 
                                     builder.setView(dialogLayout);
                                     builder.create().show();
 
-                                }else {
+                                }else if (marker.getTitle().contains("safezone")){
 
-                                    Toast.makeText(MapsActivity.this, "A safezone has been clicked", Toast.LENGTH_SHORT).show();
+                                    /**
+                                     * Show the custom adapter
+                                     * that displays the ads
+                                     * of a safezone.
+                                     */
+                                    marker.showInfoWindow();
+
+                                }else {
+                                    Snackbar snackbar = Snackbar.make(relativeLayout, "Current Location..", Snackbar.LENGTH_LONG);
+                                    View sbView = snackbar.getView();
+                                    TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+                                    textView.setTextColor(Color.RED);
+                                    snackbar.show();
                                 }
+
 
                                 return true;
                             }
                         });
 
                     }
+
 
                 } //end if
             }
@@ -400,7 +434,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
     }
-
 
     private void createMarkerBasedOnLocation() {
 
@@ -427,7 +460,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
 
-        //Store the data in shared preference to motorist object.
+        //Store the data from SharePreference to Motorist object.
         user.setAddress(sharedPreferences.getString("address", ""));
         user.setContact_number(sharedPreferences.getString("contact_number", ""));
         user.setEmail_address(sharedPreferences.getString("email", ""));
@@ -450,6 +483,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    /**
+     * @description ::
+     * Shows the AlertDialog that creates
+     * a new post
+     */
     private void showMarkerPostDialog() {
 
         final EditText input = new EditText(MapsActivity.this);
@@ -472,13 +510,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         builder.create().show();
     }
 
+    /**
+     * @description function that creates
+     * a new post record to firebase.
+     * @param text
+     */
     private void sendThePostToFirebase(final String text) {
 
         //Get timestamp
         final Long timestamp_long = System.currentTimeMillis() / 1000;
         final String timestamp = timestamp_long.toString();
 
-        //Shared Preference for Motorist Info.
+        //Shared Preference of Motorist.
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
         String email_address = sharedPreferences.getString("email", "");
 
@@ -496,7 +539,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 for(DataSnapshot motoristSnapshot : dataSnapshot.getChildren()){
-
 
                     //Get single motorist and pass it to online user.
                     Motorist motorist = motoristSnapshot.getValue(Motorist.class);
@@ -528,7 +570,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
+    /**
+     * @description :: Creates the circle in the map
+     * @param location
+     * @return
+     */
     private CircleOptions drawCircle(LatLng location){
 
         CircleOptions options = new CircleOptions();
@@ -546,7 +592,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @OnClick(R.id.create_pin_id)
     void onCreatePin() {
 
-        Toast.makeText(MapsActivity.this, "Create a Pin", Toast.LENGTH_SHORT).show();
         showMarkerPostDialog();
 //        createMarkerBasedOnLocation();
     }
@@ -558,30 +603,98 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startActivity(intent);
     }
 
-//    //In-Line Class for InfoWindowAdapter
-//    class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
-//
-//        private final View myContentsView;
-//
-//        MyInfoWindowAdapter() {
-//            myContentsView = getLayoutInflater().inflate(R.layout.dialog_layout_comment, null);
-//        }
-//
-//        @Override
-//        public View getInfoWindow(Marker marker) {
-//            return null;
-//        }
-//
-//        @Override
-//        public View getInfoContents(Marker marker) {
-//
-//            post_content = (TextView) myContentsView.findViewById(R.id.postContent);
-//            date_time = (TextView) myContentsView.findViewById(R.id.timestampID);
-//            postCommentContent = (TextView) myContentsView.findViewById(R.id.commentContentID);
-//            postCommentedBy = (TextView) myContentsView.findViewById(R.id.commentedByID);
-//            commentContentBody = (EditText) myContentsView.findViewById(R.id.post);
-//            return myContentsView;
-//        }
-//    }
+    //In-Line Class for InfoWindowAdapter
+    class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+
+        private final View myContentsView;
+
+        MyInfoWindowAdapter() {
+            myContentsView = getLayoutInflater().inflate(R.layout.show_ads_info_window, null);
+        }
+
+        @Override
+        public View getInfoWindow(Marker marker) {
+            return null;
+        }
+
+        @Override
+        public View getInfoContents(final Marker marker) {
+
+            final Safezone sz = (Safezone) marker.getTag();
+
+            ads_image = (ImageView)myContentsView.findViewById(R.id.ads);
+            adText = (TextView)myContentsView.findViewById(R.id.adText);
+            adTitle = (TextView)myContentsView.findViewById(R.id.adTitle);
+            shop_name = (TextView)myContentsView.findViewById(R.id.shop_name);
+
+            if(sz.getService_information_type().equals("repair")){
+
+                Toast.makeText(MapsActivity.this, sz.getOwner(), Toast.LENGTH_SHORT).show();
+
+                Query adsQuery = dbRef.child(ViajeConstants.ADS_KEY);
+
+                adsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        Map<String, Advertisement> td = new HashMap<String, Advertisement>();
+
+                        for (DataSnapshot advertisementSnapshot : dataSnapshot.getChildren()) {
+                            Advertisement advertisement = advertisementSnapshot.getValue(Advertisement.class);
+                            advertisement.setKey(advertisementSnapshot.getKey());
+                            td.put(advertisementSnapshot.getKey(), advertisement);
+                        }
+
+                        ArrayList<Advertisement> values = new ArrayList<>(td.values());
+                        List<String> keys = new ArrayList<String>(td.keySet());
+
+                        for (Advertisement advertisement : values) {
+
+                            if(advertisement.getUser().getOwner().equals(sz.getOwner())) {
+
+                                String imageUrl = advertisement.getImg();
+                                String text = advertisement.getText();
+                                String title = advertisement.getTitle();
+                                Long timestamp = advertisement.getTimestamp();
+
+                                adText.setText(text);
+                                adTitle.setText(title);
+                                shop_name.setText(sz.getShop_name());
+
+                                Picasso.with(getApplicationContext()).load(imageUrl).into(ads_image);
+                            }
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+            }else if(sz.getService_information_type().equals("hospital")) {
+
+                Toast.makeText(MapsActivity.this, sz.getService_information_type(), Toast.LENGTH_SHORT).show();
+
+            }else if(sz.getService_information_type().equals("towing")) {
+
+                Toast.makeText(MapsActivity.this, sz.getService_information_type(), Toast.LENGTH_SHORT).show();
+
+            }else if(sz.getService_information_type().equals("vulcanizing")) {
+
+                Toast.makeText(MapsActivity.this, sz.getService_information_type(), Toast.LENGTH_SHORT).show();
+
+            }else if(sz.getService_information_type().equals("gasoline")) {
+
+                Toast.makeText(MapsActivity.this, sz.getService_information_type(), Toast.LENGTH_SHORT).show();
+
+            }
+
+            myContentsView.setLayoutParams(new LinearLayout.LayoutParams(700, 1000));
+            return myContentsView;
+        }
+    }
 
 }

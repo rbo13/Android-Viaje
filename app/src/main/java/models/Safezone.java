@@ -14,6 +14,8 @@ public class Safezone {
     String shop_name;
     String type;
     String username;
+    String key;
+
 
     public Safezone() {  }
 
@@ -26,6 +28,14 @@ public class Safezone {
         this.shop_name = shop_name;
         this.type = type;
         this.username = username;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public void setAddress(Address address) {
