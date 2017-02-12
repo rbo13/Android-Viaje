@@ -1,5 +1,6 @@
 package com.app.viaje.viaje;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -125,8 +126,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         gps = new GPSTracker(MapsActivity.this);
 
-        Toast.makeText(MapsActivity.this, "Map Ready..", Toast.LENGTH_SHORT).show();
-
         getSafezones(googleMap);
         currentUserLocation(googleMap);
         getPosts();
@@ -239,8 +238,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .snippet(shop_name + " Owned By: " + owner)
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.repair)))
                                         .setTag(safezone);
-
-                                mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "gasoline":
@@ -249,7 +246,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .snippet(shop_name + " Owned By: " + owner)
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.gasoline)))
                                         .setTag(safezone);
-                                //mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "police_station":
@@ -258,7 +254,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .snippet(shop_name + " Owned By: " + owner)
                                         .icon(BitmapDescriptorFactory.fromResource(R.raw.police)))
                                         .setTag(safezone);
-                                //mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "hospital":
@@ -267,7 +262,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .snippet(shop_name + " Owned By: " + owner)
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.hospital)))
                                         .setTag(safezone);
-                                //mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "towing":
@@ -276,7 +270,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .snippet(shop_name + " Owned By: " + owner)
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.towing)))
                                         .setTag(safezone);
-                                //mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
 
                             case "vulcanizing":
@@ -285,13 +278,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .snippet(shop_name + " Owned By: " + owner)
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.vulcanizing)))
                                         .setTag(safezone);
-                                //mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
                                 break;
                         }
 
                     }
 
-                } //end if
+                }//end if
 
             }
 
@@ -302,9 +294,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    private void getPosts() {
 
-        Toast.makeText(MapsActivity.this, "Getting all Post..", Toast.LENGTH_SHORT).show();
+    private void getPosts() {
 
         final Query queryRef = dbRef.child(ViajeConstants.POSTS_KEY);
 
@@ -402,20 +393,82 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 }else if (marker.getTitle().contains("safezone")){
 
                                     /**
-                                     * Show the custom adapter
-                                     * that displays the ads
-                                     * of a safezone.
+                                     * If the marker type is safezone
+                                     * then get the advertisement instead
+                                     * of posts.
                                      */
-                                    marker.showInfoWindow();
+                                    final Safezone sz = (Safezone) marker.getTag();
+
+                                    /**
+                                     * Layout Inflater for the
+                                     * alert dialog when a marker
+                                     * has been click
+                                     */
+                                    LayoutInflater inflater = getLayoutInflater();
+                                    View adsDialog = inflater.inflate(R.layout.show_ads_info_window, null, false);
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+
+                                    ads_image = (ImageView) adsDialog.findViewById(R.id.ads);
+                                    adText = (TextView) adsDialog.findViewById(R.id.adText);
+                                    adTitle = (TextView) adsDialog.findViewById(R.id.adTitle);
+                                    shop_name = (TextView) adsDialog.findViewById(R.id.shop_name);
+
+                                    String service_type = sz.getService_information_type();
+                                    String username = sz.getUsername();
+                                    System.out.print(username);
+
+                                    if(service_type.contains("repair")){
+
+                                        /**
+                                         * @description Get ads of every
+                                         * safezone
+                                         */
+                                        getAds(sz);
+
+                                    }else if(service_type.contains("hospital")) {
+
+                                        /**
+                                         * @description Get ads of every
+                                         * safezone
+                                         */
+                                        getAds(sz);
+
+                                    }else if(service_type.contains("towing")) {
+
+                                        /**
+                                         * @description Get ads of every
+                                         * safezone
+                                         */
+                                        getAds(sz);
+
+                                    }else if(service_type.contains("vulcanizing")) {
+
+                                        /**
+                                         * @description Get ads of every
+                                         * safezone
+                                         */
+                                        getAds(sz);
+
+                                    }else if(service_type.contains("gasoline")) {
+
+                                        /**
+                                         * @description Get ads of every
+                                         * safezone
+                                         */
+                                        getAds(sz);
+
+                                    }
+
+                                    builder.setView(adsDialog);
+                                    builder.create().show();
 
                                 }else {
                                     Snackbar snackbar = Snackbar.make(relativeLayout, "Current Location..", Snackbar.LENGTH_LONG);
                                     View sbView = snackbar.getView();
                                     TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
-                                    textView.setTextColor(Color.RED);
+                                    textView.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.app_color));
                                     snackbar.show();
                                 }
-
 
                                 return true;
                             }
@@ -423,8 +476,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     }
 
-
-                } //end if
+                }//end if
             }
 
             @Override
@@ -435,19 +487,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void createMarkerBasedOnLocation() {
+    private void getAds(final Safezone sz) {
+        Query adsQuery = dbRef.child(ViajeConstants.ADS_KEY)
+                .orderByChild("user/username")
+                .equalTo(sz.getUsername());
 
-        SharedPreferences sharedPreferences = getSharedPreferences("userCoordinates", Context.MODE_PRIVATE);
+        adsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-        double latitude = Double.parseDouble(sharedPreferences.getString("latitude", ""));
-        double longitude = Double.parseDouble(sharedPreferences.getString("longitude", ""));
+                Map<String, Advertisement> td = new HashMap<String, Advertisement>();
 
-        LatLng safezone_location = new LatLng(latitude, longitude); // Safezone Current Location
+                for (DataSnapshot advertisementSnapshot : dataSnapshot.getChildren()) {
+                    Advertisement advertisement = advertisementSnapshot.getValue(Advertisement.class);
+                    advertisement.setKey(advertisementSnapshot.getKey());
+                    td.put(advertisementSnapshot.getKey(), advertisement);
+                }
 
-        mMap.addMarker(new MarkerOptions().position(safezone_location)
-                .title("Current Location")
-                .snippet("Your Location")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.motorist)));
+                ArrayList<Advertisement> values = new ArrayList<>(td.values());
+                List<String> keys = new ArrayList<String>(td.keySet());
+
+                for (Advertisement advertisement : values) {
+
+                    System.out.print(advertisement);
+
+                    String imageUrl = advertisement.getImg();
+                    String text = advertisement.getText();
+                    String title = advertisement.getTitle();
+                    Long timestamp = advertisement.getTimestamp();
+
+                    adText.setText(text);
+                    adTitle.setText(title);
+                    shop_name.setText(sz.getShop_name());
+
+                    Picasso.with(getApplicationContext()).load(imageUrl).into(ads_image);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void postComment(final String commentText, Object key) {
@@ -593,7 +675,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     void onCreatePin() {
 
         showMarkerPostDialog();
-//        createMarkerBasedOnLocation();
     }
 
     @OnClick(R.id.back_to_menu_id)
@@ -601,100 +682,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
-    }
-
-    //In-Line Class for InfoWindowAdapter
-    class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
-
-        private final View myContentsView;
-
-        MyInfoWindowAdapter() {
-            myContentsView = getLayoutInflater().inflate(R.layout.show_ads_info_window, null);
-        }
-
-        @Override
-        public View getInfoWindow(Marker marker) {
-            return null;
-        }
-
-        @Override
-        public View getInfoContents(final Marker marker) {
-
-            final Safezone sz = (Safezone) marker.getTag();
-
-            ads_image = (ImageView)myContentsView.findViewById(R.id.ads);
-            adText = (TextView)myContentsView.findViewById(R.id.adText);
-            adTitle = (TextView)myContentsView.findViewById(R.id.adTitle);
-            shop_name = (TextView)myContentsView.findViewById(R.id.shop_name);
-
-            if(sz.getService_information_type().equals("repair")){
-
-                Toast.makeText(MapsActivity.this, sz.getOwner(), Toast.LENGTH_SHORT).show();
-
-                Query adsQuery = dbRef.child(ViajeConstants.ADS_KEY);
-
-                adsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        Map<String, Advertisement> td = new HashMap<String, Advertisement>();
-
-                        for (DataSnapshot advertisementSnapshot : dataSnapshot.getChildren()) {
-                            Advertisement advertisement = advertisementSnapshot.getValue(Advertisement.class);
-                            advertisement.setKey(advertisementSnapshot.getKey());
-                            td.put(advertisementSnapshot.getKey(), advertisement);
-                        }
-
-                        ArrayList<Advertisement> values = new ArrayList<>(td.values());
-                        List<String> keys = new ArrayList<String>(td.keySet());
-
-                        for (Advertisement advertisement : values) {
-
-                            if(advertisement.getUser().getOwner().equals(sz.getOwner())) {
-
-                                String imageUrl = advertisement.getImg();
-                                String text = advertisement.getText();
-                                String title = advertisement.getTitle();
-                                Long timestamp = advertisement.getTimestamp();
-
-                                adText.setText(text);
-                                adTitle.setText(title);
-                                shop_name.setText(sz.getShop_name());
-
-                                Picasso.with(getApplicationContext()).load(imageUrl).into(ads_image);
-                            }
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-            }else if(sz.getService_information_type().equals("hospital")) {
-
-                Toast.makeText(MapsActivity.this, sz.getService_information_type(), Toast.LENGTH_SHORT).show();
-
-            }else if(sz.getService_information_type().equals("towing")) {
-
-                Toast.makeText(MapsActivity.this, sz.getService_information_type(), Toast.LENGTH_SHORT).show();
-
-            }else if(sz.getService_information_type().equals("vulcanizing")) {
-
-                Toast.makeText(MapsActivity.this, sz.getService_information_type(), Toast.LENGTH_SHORT).show();
-
-            }else if(sz.getService_information_type().equals("gasoline")) {
-
-                Toast.makeText(MapsActivity.this, sz.getService_information_type(), Toast.LENGTH_SHORT).show();
-
-            }
-
-            myContentsView.setLayoutParams(new LinearLayout.LayoutParams(700, 1000));
-            return myContentsView;
-        }
     }
 
 }

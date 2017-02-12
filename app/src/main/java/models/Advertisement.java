@@ -11,6 +11,7 @@ public class Advertisement {
     public Long timestamp;
     public String title;
     public Safezone user;
+    public String username;
 
     public String key;
 
@@ -20,6 +21,14 @@ public class Advertisement {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getImg() {

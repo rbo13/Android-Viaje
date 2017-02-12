@@ -1,38 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/activity_horizontal_margin_md">
 
-    <ImageView
-        android:id="@+id/ads"
-        android:layout_width="@dimen/activity_horizontal_margin_xlg"
-        android:layout_height="@dimen/activity_vertical_margin_xlg"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_horizontal_margin_s">
+
+    <View
+        android:layout_width="@dimen/activity_horizontal_margin_lg"
+        android:layout_height="@dimen/activity_horizontal_margin_s"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/timestampID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/app_color"/>
+
+        <View
+            android:layout_width="@dimen/activity_horizontal_margin"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:id="@+id/adTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="@dimen/font_size_default_s"
+            android:padding="@dimen/activity_horizontal_margin_s"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/shop_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/adTitle"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_gravity="center"
+        android:paddingLeft="@dimen/activity_horizontal_margin_lg"
+        android:paddingStart="@dimen/activity_horizontal_margin_lg"
+        android:paddingEnd="@dimen/activity_horizontal_margin_md"
+        android:paddingRight="@dimen/activity_horizontal_margin_md"
         android:textSize="@dimen/font_size_default_s"/>
 
-    <TextView
-        android:id="@+id/adTitle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/ads"
-        android:textSize="@dimen/font_size_default_s"
-        android:padding="@dimen/activity_horizontal_margin_s"/>
+        android:padding="@dimen/activity_horizontal_margin_s"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/ads"
+            android:layout_width="@dimen/activity_horizontal_margin_xlg"
+            android:layout_height="@dimen/activity_vertical_margin_xlg"
+            android:layout_gravity="center"
+            android:paddingBottom="@dimen/activity_horizontal_margin_s"/>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/adText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ads"
-        android:textSize="@dimen/font_size_default_s" />
+        android:textSize="@dimen/font_size_default_s"
+        android:layout_gravity="center"
+        android:paddingTop="@dimen/activity_horizontal_margin_s"
+        android:paddingBottom="@dimen/activity_horizontal_margin_md"/>
 
-</RelativeLayout>
+</LinearLayout>

@@ -50,4 +50,11 @@
     <string name="post_content">Haha</string>
 
 
+    <string name="ad_title">AD Title: </string>
+    <string name="shop">Shop: </string>
+    <string name="event_name">Event Name: </string>
+
+
+
+
 </resources>
