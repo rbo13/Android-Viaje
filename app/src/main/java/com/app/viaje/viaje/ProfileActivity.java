@@ -131,8 +131,6 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-//        displayUserInformation();
     }
 
     @Override
@@ -412,7 +410,6 @@ public class ProfileActivity extends AppCompatActivity {
 
 
     private void editProfileFullName() {
-        Toast.makeText(ProfileActivity.this, "Update Profile Full Name", Toast.LENGTH_SHORT).show();
 
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
         String email_address = sharedPreferences.getString("email", "");
@@ -450,9 +447,6 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void editProfilePlateNumber(){
-
-        Toast.makeText(ProfileActivity.this, "Update Profile Plate Number", Toast.LENGTH_SHORT).show();
-
 
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
         String email_address = sharedPreferences.getString("email", "");
@@ -492,9 +486,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void editProfileContactNumber() {
 
-        Toast.makeText(ProfileActivity.this, "Update Profile Contact Number", Toast.LENGTH_SHORT).show();
-
-
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
         String email_address = sharedPreferences.getString("email", "");
 
@@ -532,9 +523,6 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void editProfileAddress() {
-
-        Toast.makeText(ProfileActivity.this, "Update Profile Address", Toast.LENGTH_SHORT).show();
-
 
         SharedPreferences sharedPreferences = getSharedPreferences("motoristInfo", Context.MODE_PRIVATE);
         String email_address = sharedPreferences.getString("email", "");
@@ -595,8 +583,6 @@ public class ProfileActivity extends AppCompatActivity {
     @OnClick(R.id.edit_profile_full_name)
     void onEditProfileFullName() {
 
-        Toast.makeText(ProfileActivity.this, "Update Profile", Toast.LENGTH_LONG).show();
-
         fullNameUpdate.setVisibility(View.VISIBLE);
         full_name_text.setVisibility(View.INVISIBLE);
         updateFullName.setVisibility(View.INVISIBLE);
@@ -606,8 +592,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     @OnClick(R.id.edit_profile_plate_number)
     void onEditProfilePlateNumber() {
-
-        Toast.makeText(ProfileActivity.this, "Update Profile Plate Number", Toast.LENGTH_SHORT).show();
 
         plateNumberUpdate.setVisibility(View.VISIBLE);
         plate_number_text.setVisibility(View.INVISIBLE);
@@ -619,7 +603,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     @OnClick(R.id.edit_profile_email)
     void onEditProfileEmail() {
-        Toast.makeText(ProfileActivity.this, "Update Profile Email", Toast.LENGTH_SHORT).show();
 
         emailUpdate.setVisibility(View.VISIBLE);
         email_text.setVisibility(View.INVISIBLE);
@@ -630,7 +613,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     @OnClick(R.id.edit_profile_contact)
     void onEditProfileContact() {
-        Toast.makeText(ProfileActivity.this, "Update Profile Contact", Toast.LENGTH_SHORT).show();
 
         contactNumberUpdate.setVisibility(View.VISIBLE);
         contact_number_text.setVisibility(View.INVISIBLE);
@@ -641,7 +623,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     @OnClick(R.id.edit_profile_address)
     void onEditProfileAddress() {
-        Toast.makeText(ProfileActivity.this, "Update Profile Address", Toast.LENGTH_SHORT).show();
 
         addressUpdate.setVisibility(View.VISIBLE);
         address_text.setVisibility(View.INVISIBLE);
@@ -654,7 +635,6 @@ public class ProfileActivity extends AppCompatActivity {
     @OnClick(R.id.update_profile_name_image)
     void editFullName() {
 
-        Toast.makeText(ProfileActivity.this, "Update at Full Name Firebase", Toast.LENGTH_LONG).show();
         fullNameUpdate.setVisibility(View.GONE);
         full_name_text.setVisibility(View.VISIBLE);
         updateFullName.setVisibility(View.VISIBLE);
@@ -672,8 +652,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     @OnClick(R.id.update_profile_plate_number)
     void editPlateNumber() {
-
-        Toast.makeText(ProfileActivity.this, "Update Plate Number at Firebase", Toast.LENGTH_LONG).show();
 
         plateNumberUpdate.setVisibility(View.GONE);
         plate_number_text.setVisibility(View.VISIBLE);
@@ -693,7 +671,6 @@ public class ProfileActivity extends AppCompatActivity {
     @OnClick(R.id.update_profile_contact)
     void editContactNumber() {
 
-        Toast.makeText(ProfileActivity.this, "Update Contact Number at Firebase", Toast.LENGTH_SHORT).show();
         contactNumberUpdate.setVisibility(View.GONE);
         contact_number_text.setVisibility(View.VISIBLE);
         updateContact.setVisibility(View.VISIBLE);
@@ -712,7 +689,6 @@ public class ProfileActivity extends AppCompatActivity {
     @OnClick(R.id.update_profile_address)
     void editAddress() {
 
-        Toast.makeText(ProfileActivity.this, "Update Address at Firebase", Toast.LENGTH_SHORT).show();
         addressUpdate.setVisibility(View.GONE);
         address_text.setVisibility(View.VISIBLE);
         updateAddress.setVisibility(View.VISIBLE);

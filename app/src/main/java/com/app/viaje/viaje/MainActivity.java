@@ -504,8 +504,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Toast.makeText(MainActivity.this, "Dont send help!", Toast.LENGTH_SHORT).show();
+
+                    Snackbar snackbar = Snackbar.make(coordinatorLayout, "Don't send help..", Snackbar.LENGTH_LONG);
+                    View sbView = snackbar.getView();
+                    TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+                    textView.setTextColor(Color.RED);
+
+                    snackbar.show();
                 }
+
             });
 
             String negativeText = getString(R.string.dialog_negative_text);
@@ -540,12 +547,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @OnClick(R.id.emergency_button_id)
     void onEmergencyClick(){
-//        Snackbar snackbar = Snackbar.make(coordinatorLayout, "Help is coming!", Snackbar.LENGTH_LONG);
-//        View sbView = snackbar.getView();
-//        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
-//        textView.setTextColor(Color.RED);
-//
-//        snackbar.show();
 
         sendSafezoneHelp();
     }
