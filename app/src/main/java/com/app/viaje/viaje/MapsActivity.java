@@ -319,7 +319,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String postContent = post.getText();
                         final String username = post.getUser().getUsername();
 
-
                         LatLng location = new LatLng(lat, lng); //User current location
 
                         mMap.addMarker(new MarkerOptions().position(location)
@@ -360,18 +359,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                      * Loop every entry of p.comments
                                      * inside the marker.getTag().
                                      */
-                                    Iterator entries = p.comments.entrySet().iterator();
-                                    while (entries.hasNext()) {
-                                        Map.Entry myEntry = (Map.Entry) entries.next();
-                                        Object key = myEntry.getKey();
-                                        Post.Comment value = (Post.Comment) myEntry.getValue();
+                                    if(p.comments != null) {
+                                        Iterator entries = p.comments.entrySet().iterator();
 
-                                        sb.append(username+"\n \t \t"+value.getText());
-                                        sb.append("\n");
+                                        while (entries.hasNext()) {
+                                            Map.Entry myEntry = (Map.Entry) entries.next();
+                                            Object key = myEntry.getKey();
+                                            Post.Comment value = (Post.Comment) myEntry.getValue();
+                                            String commenter = value.getUser().getUsername();
 
-                                        postCommentedBy.setText(sb.toString());
+                                            sb.append(commenter+"\n \t \t"+value.getText());
+                                            sb.append("\n");
 
+                                            postCommentedBy.setText(sb.toString());
+
+                                        }
                                     }
+
                                     //Button that submits a comment to a post.
                                     builder.setPositiveButton("Post Comment", new DialogInterface.OnClickListener() {
                                         @Override
