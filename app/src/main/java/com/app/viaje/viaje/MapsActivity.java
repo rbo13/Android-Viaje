@@ -376,14 +376,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     builder.setPositiveButton("Post Comment", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            String comment = commentContentBody.getText().toString();
+                                            String comment = commentContentBody.getText().toString().trim();
 
                                             /**
                                              * Function declaration that
                                              * submits a comment to the 'post'
                                              * at firebase database.
                                              */
-                                            postComment(comment, marker.getSnippet());
+                                            if(comment.isEmpty()){
+                                                Snackbar snackbar = Snackbar.make(relativeLayout, "Comment must not be empty..", Snackbar.LENGTH_LONG);
+                                                View sbView = snackbar.getView();
+                                                TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+                                                textView.setTextColor(Color.RED);
+                                                snackbar.show();
+                                            }else {
+                                                postComment(comment, marker.getSnippet());
+                                            }
+
                                         }
                                     });
 
