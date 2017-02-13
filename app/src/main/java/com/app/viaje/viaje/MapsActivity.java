@@ -593,8 +593,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         builder.setPositiveButton("Post", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                textContent = input.getText().toString();
-                sendThePostToFirebase(textContent);
+                textContent = input.getText().toString().trim();
+
+                if (textContent.isEmpty()) {
+                    Snackbar snackbar = Snackbar.make(relativeLayout, "Post must not be empty..", Snackbar.LENGTH_LONG);
+                    View sbView = snackbar.getView();
+                    TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+                    textView.setTextColor(Color.RED);
+                    snackbar.show();
+                }else {
+                    sendThePostToFirebase(textContent);
+                }
             }
         });
 
